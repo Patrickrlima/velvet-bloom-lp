@@ -255,36 +255,44 @@
      ============================================================ */
   .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;color:var(--bone);}
   .hero-stage{position:absolute;inset:0;z-index:0;background:var(--velvet-deep);}
+  /* Slideshow conduzido por JS (ver initHeroSlider): a troca automática
+     continua, mas agora dá para navegar manualmente pelas setas laterais.
+     A transição é um crossfade simples de opacidade — como todos os slides
+     ficam empilhados no mesmo lugar, o de baixo cobre o fundo enquanto o de
+     cima aparece, então nunca "pisca" o fundo entre uma foto e outra. */
   .hero-slide{
     position:absolute;inset:0;
     background-position:center;background-size:cover;background-repeat:no-repeat;
     opacity:0;
-    animation:heroFade 42s infinite;
+    transition:opacity 1.5s linear;
   }
+  .hero-slide.is-active{opacity:1;}
   .hero-slide .kb{position:absolute;inset:-4%;background-position:inherit;background-size:cover;background-repeat:no-repeat;animation:heroZoom 18s ease-in-out infinite alternate;}
-  .hero-slide:nth-child(1){animation-delay:0s;}
-  .hero-slide:nth-child(2){animation-delay:6s;}
-  .hero-slide:nth-child(3){animation-delay:12s;}
-  .hero-slide:nth-child(4){animation-delay:18s;}
-  .hero-slide:nth-child(5){animation-delay:24s;}
-  .hero-slide:nth-child(6){animation-delay:30s;}
-  .hero-slide:nth-child(7){animation-delay:36s;}
-  /* True crossfade: each slide's fade-out (14.286%→17.857%, i.e. seconds 6→7.5
-     of its own local 42s timeline) exactly overlaps the next slide's fade-in
-     (0%→3.571%, seconds 0→1.5 after ITS delay kicks in — which lands on the
-     very same global instant, 6s later). Because both ramps are linear and
-     span the identical duration, their opacities sum to exactly 1 for the
-     whole handoff, so the light page background never peeks through as a
-     white flash between photos. */
-  @keyframes heroFade{
-    0%{opacity:0;} 3.571%{opacity:1;} 14.286%{opacity:1;} 17.857%{opacity:0;} 100%{opacity:0;}
-  }
   @keyframes heroZoom{ from{transform:scale(1);} to{transform:scale(1.09);} }
   @media (prefers-reduced-motion: reduce){
-    .hero-slide{animation:none;opacity:0;}
-    .hero-slide:first-child{opacity:1;}
+    .hero-slide{transition:none;}
     .hero-slide .kb{animation:none;}
   }
+  /* Setas de navegação: um traço fino com a ponta em seta, no mesmo espírito
+     gráfico dos filetes dourados usados no resto da página. */
+  .hero-nav{
+    position:absolute;z-index:3;top:50%;transform:translateY(-50%);
+    width:56px;height:56px;padding:0;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:0;cursor:pointer;color:var(--gold-soft);
+    transition:color .4s var(--ease), opacity .4s var(--ease);
+    opacity:.75;
+  }
+  .hero-nav:hover,.hero-nav:focus-visible{color:var(--bone);opacity:1;}
+  .hero-nav svg{width:38px;height:12px;overflow:visible;}
+  .hero-nav svg line,.hero-nav svg polyline{
+    stroke:currentColor;stroke-width:1.2;fill:none;
+    transition:transform .4s var(--ease);
+  }
+  .hero-prev{left:clamp(.35rem,1.6vw,1.6rem);}
+  .hero-next{right:clamp(.35rem,1.6vw,1.6rem);}
+  .hero-prev:hover svg line,.hero-prev:focus-visible svg line{transform:translateX(-3px);}
+  .hero-next:hover svg line,.hero-next:focus-visible svg line{transform:translateX(3px);}
   .hero-overlay{
     position:absolute;inset:0;z-index:1;
     background:
@@ -596,6 +604,10 @@
     .delivery{grid-template-columns:1fr;text-align:left;}
     .delivery-icon{margin-bottom:.5rem;}
     .footer-grid{grid-template-columns:1fr;gap:2rem;}
+    /* No mobile o texto do hero é centralizado e ocupa quase toda a largura,
+       então as setas sobem para a faixa livre da foto, acima do título. */
+    .hero-nav{top:24%;transform:none;width:48px;height:48px;}
+    .hero-nav svg{width:30px;}
     .hero-inner{padding-top:6.5rem;text-align:center;}
     .hero-eyebrow{justify-content:center;}
     .hero-title{font-size:clamp(3.3rem,13vw,4rem);margin-inline:auto;}
@@ -659,7 +671,7 @@
 
 <!-- ======================= HERO ======================= -->
 <section class="hero on-dark" id="inicio">
-  <div class="hero-stage" aria-hidden="true">
+  <div class="hero-stage" id="heroStage" aria-hidden="true">
     <div class="hero-slide"><div class="kb" style="background-image:url('assets/hero/rose-black.webp')"></div></div>
     <div class="hero-slide"><div class="kb" style="background-image:url('assets/hero/tulips.webp')"></div></div>
     <div class="hero-slide"><div class="kb" style="background-image:url('assets/hero/roses-pink.webp')"></div></div>
@@ -669,6 +681,12 @@
     <div class="hero-slide"><div class="kb" style="background-image:url('assets/hero/roses-field.webp')"></div></div>
   </div>
   <div class="hero-overlay" aria-hidden="true"></div>
+  <button class="hero-nav hero-prev" id="heroPrev" type="button" aria-label="Foto anterior">
+    <svg viewBox="0 0 38 12" aria-hidden="true"><line x1="38" y1="6" x2="2" y2="6"/><polyline points="8,1 2,6 8,11"/></svg>
+  </button>
+  <button class="hero-nav hero-next" id="heroNext" type="button" aria-label="Próxima foto">
+    <svg viewBox="0 0 38 12" aria-hidden="true"><line x1="0" y1="6" x2="36" y2="6"/><polyline points="30,1 36,6 30,11"/></svg>
+  </button>
   <div class="hero-inner container">
     <p class="eyebrow hero-eyebrow">Floricultura em Imbé · Litoral Norte do RS</p>
     <div class="hero-title-wrap">
@@ -968,6 +986,49 @@
 <script>
 (function(){
   "use strict";
+
+  /* Slideshow do hero: troca sozinho a cada 6s e também aceita navegação
+     manual pelas setas laterais. Cada clique reinicia a contagem, para a
+     foto escolhida não sumir logo em seguida. Com prefers-reduced-motion
+     não roda sozinho, mas as setas continuam funcionando. */
+  (function initHeroSlider(){
+    var stage = document.getElementById("heroStage");
+    if(!stage) return;
+    var slides = Array.prototype.slice.call(stage.querySelectorAll(".hero-slide"));
+    if(!slides.length) return;
+
+    var AUTO_MS = 6000;
+    var reduceMotionHero = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var index = 0;
+    var timer = null;
+
+    function show(i){
+      index = (i % slides.length + slides.length) % slides.length;
+      for(var n = 0; n < slides.length; n++){
+        slides[n].classList.toggle("is-active", n === index);
+      }
+    }
+    function schedule(){
+      window.clearTimeout(timer);
+      if(reduceMotionHero || slides.length < 2) return;
+      timer = window.setTimeout(function(){ show(index + 1); schedule(); }, AUTO_MS);
+    }
+    function go(step){ show(index + step); schedule(); }
+
+    show(0);
+    schedule();
+
+    var prev = document.getElementById("heroPrev");
+    var next = document.getElementById("heroNext");
+    if(prev) prev.addEventListener("click", function(){ go(-1); });
+    if(next) next.addEventListener("click", function(){ go(1); });
+
+    /* Uma única foto não precisa de setas. */
+    if(slides.length < 2){
+      if(prev) prev.style.display = "none";
+      if(next) next.style.display = "none";
+    }
+  })();
 
   /* ---------------------------------------------------------------
      Número de WhatsApp — PLACEHOLDER.

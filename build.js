@@ -53,7 +53,19 @@ const documento =
   "\n</body>\n</html>\n";
 
 /* ---------- escreve ---------- */
-fs.rmSync(DESTINO, { recursive: true, force: true });
+/* Limpa a saída anterior. Escrito sem depender de fs.rmSync (que só existe a
+   partir do Node 14.14) para o build funcionar em qualquer versão do Node que
+   o servidor de build tiver — assim não é preciso fixar versão em lugar nenhum. */
+function apagarPasta(alvo) {
+  if (!fs.existsSync(alvo)) return;
+  for (const item of fs.readdirSync(alvo)) {
+    const caminho = path.join(alvo, item);
+    if (fs.statSync(caminho).isDirectory()) apagarPasta(caminho);
+    else fs.unlinkSync(caminho);
+  }
+  fs.rmdirSync(alvo);
+}
+apagarPasta(DESTINO);
 fs.mkdirSync(DESTINO, { recursive: true });
 
 fs.writeFileSync(path.join(DESTINO, "index.html"), documento, "utf8");

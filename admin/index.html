@@ -168,11 +168,23 @@
   function mostraAviso(caixa, tipo, texto){
     caixa.className = 'aviso ' + tipo;
     caixa.textContent = texto;
+    /* O botão de publicar fica fixo no rodapé, mas o aviso nasce no topo da
+       página: sem rolar até ele, o usuário clica e parece que nada aconteceu.
+       Levar o aviso para a vista é o que fecha esse laço. */
+    if(caixa.scrollIntoView) caixa.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /* Além do aviso no topo, um resumo curto na barra fixa de baixo — é onde
+     o olho já está no momento do clique. */
+  function estadoBarra(tipo, texto){
+    var estado = el('estado');
+    estado.textContent = texto;
+    estado.style.color = tipo === 'erro' ? 'var(--erro)' : (tipo === 'ok' ? 'var(--ok)' : 'var(--ink-soft)');
   }
 
   function marcaAlterado(){
     alterado = true;
-    el('estado').textContent = 'Alterações não publicadas';
+    estadoBarra('', 'Alterações não publicadas');
   }
 
   /* Lê um caminho tipo "hero.subtitulo" dentro do conteúdo. */
@@ -534,7 +546,7 @@
     api('/api/conteudo', { method:'POST', body: JSON.stringify({ conteudo: conteudo, sha: sha }) })
       .then(function(){
         alterado = false;
-        estado.textContent = '';
+        estadoBarra('ok', '✓ Publicado');
         mostraAviso(el('avisoTopo'), 'ok',
           'Publicado! O site fica atualizado em cerca de 1 minuto. Pode fechar esta página.');
         el('avisoTopo').classList.remove('oculto');
@@ -542,7 +554,7 @@
         return api('/api/conteudo').then(function(dados){ sha = dados.sha; });
       })
       .catch(function(erro){
-        estado.textContent = '';
+        estadoBarra('erro', 'Não publicou — veja o aviso acima');
         mostraAviso(el('avisoTopo'), 'erro', erro.message);
         el('avisoTopo').classList.remove('oculto');
       })

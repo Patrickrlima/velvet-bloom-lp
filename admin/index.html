@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel — Velvet Bloom</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B9%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#24121b; --ink-soft:#6b5460; --velvet:#7d1f3d; --velvet-deep:#2c0b16;
+    --bone:#f6efe3; --bone-deep:#efe4d4; --linha:#ddd0c4; --gold:#b08d3f;
+    --ok:#1d7a4c; --erro:#a3202f;
+    --raio:10px;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bone);color:var(--ink);line-height:1.5;}
+
+  /* ---------- estrutura ---------- */
+  .topo{
+    position:sticky;top:0;z-index:10;
+    background:var(--velvet-deep);color:var(--bone);
+    padding:.85rem 1rem;
+    display:flex;align-items:center;gap:1rem;justify-content:space-between;
+  }
+  .topo h1{font-size:1rem;margin:0;font-weight:600;letter-spacing:.02em;}
+  .topo small{display:block;font-weight:400;opacity:.7;font-size:.75rem;}
+  .envolve{max-width:760px;margin:0 auto;padding:1rem 1rem 7rem;}
+
+  /* ---------- login ---------- */
+  .login{max-width:380px;margin:15vh auto;padding:0 1.25rem;text-align:center;}
+  .login h1{font-size:1.5rem;margin:0 0 .35rem;}
+  .login p{color:var(--ink-soft);margin:0 0 1.75rem;font-size:.95rem;}
+
+  /* ---------- formulário ---------- */
+  label{display:block;font-size:.82rem;font-weight:600;margin:0 0 .35rem;color:var(--ink-soft);}
+  input[type=text],input[type=password],textarea{
+    width:100%;padding:.7rem .8rem;font:inherit;font-size:1rem;
+    border:1px solid var(--linha);border-radius:var(--raio);background:#fff;color:var(--ink);
+  }
+  input:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent;}
+  textarea{resize:vertical;min-height:4.5rem;}
+  .campo{margin-bottom:1.1rem;}
+  .dica{font-size:.75rem;color:var(--ink-soft);margin-top:.3rem;}
+
+  button{
+    font:inherit;font-weight:600;cursor:pointer;border-radius:999px;border:1px solid transparent;
+    padding:.7rem 1.4rem;transition:filter .2s,opacity .2s;
+  }
+  button:hover:not(:disabled){filter:brightness(1.08);}
+  button:disabled{opacity:.55;cursor:default;}
+  .bt-principal{background:var(--velvet);color:var(--bone);}
+  .bt-secundario{background:transparent;border-color:var(--linha);color:var(--ink);}
+  .bt-claro{background:transparent;border-color:rgba(246,239,227,.4);color:var(--bone);padding:.45rem 1rem;font-size:.85rem;}
+  .largo{width:100%;}
+
+  /* ---------- seções ---------- */
+  .secao{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);margin-bottom:.7rem;overflow:hidden;}
+  .secao > summary{
+    padding:.95rem 1rem;cursor:pointer;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:.5rem;
+  }
+  .secao > summary::-webkit-details-marker{display:none;}
+  .secao > summary::after{content:"▾";color:var(--ink-soft);transition:transform .2s;}
+  .secao[open] > summary::after{transform:rotate(180deg);}
+  .secao > summary:hover{background:var(--bone-deep);}
+  .corpo{padding:0 1rem 1.1rem;border-top:1px solid var(--linha);padding-top:1.1rem;}
+  .sub{font-size:.75rem;font-weight:400;color:var(--ink-soft);}
+
+  /* ---------- lista de itens (frases, ocasiões...) ---------- */
+  .item-lista{display:flex;gap:.5rem;margin-bottom:.5rem;align-items:flex-start;}
+  .item-lista input{flex:1;}
+  .bt-remover{
+    background:transparent;border:1px solid var(--linha);color:var(--erro);
+    padding:.55rem .75rem;border-radius:var(--raio);line-height:1;flex:none;
+  }
+  .bt-adicionar{background:transparent;border:1px dashed var(--linha);color:var(--ink-soft);
+    padding:.5rem 1rem;font-size:.85rem;border-radius:var(--raio);}
+
+  /* ---------- fotos ---------- */
+  .fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem;}
+  .foto{position:relative;border:1px solid var(--linha);border-radius:var(--raio);overflow:hidden;background:var(--bone-deep);}
+  .foto img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+  .foto .trocar{
+    display:block;width:100%;padding:.45rem;border:0;border-top:1px solid var(--linha);
+    background:#fff;font-size:.78rem;font-weight:600;color:var(--velvet);cursor:pointer;
+  }
+  .foto .trocar:hover{background:var(--bone-deep);}
+  .foto.enviando{opacity:.5;}
+
+  /* ---------- barra de publicar ---------- */
+  .barra{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:#fff;border-top:1px solid var(--linha);
+    padding:.8rem 1rem;display:flex;gap:.8rem;align-items:center;justify-content:center;
+    box-shadow:0 -6px 20px -12px rgba(0,0,0,.3);
+  }
+  .barra .estado{font-size:.85rem;color:var(--ink-soft);}
+
+  /* ---------- avisos ---------- */
+  .aviso{padding:.7rem .9rem;border-radius:var(--raio);font-size:.9rem;margin-bottom:1rem;}
+  .aviso.erro{background:#fbe9eb;color:var(--erro);border:1px solid #f0c9ce;}
+  .aviso.ok{background:#e7f5ee;color:var(--ok);border:1px solid #c3e5d3;}
+  .aviso.info{background:#fdf6e7;color:#7a5c1a;border:1px solid #eeddb8;}
+  .oculto{display:none !important;}
+  .girando{display:inline-block;width:.85em;height:.85em;border:2px solid currentColor;
+    border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite;vertical-align:-1px;}
+  @keyframes gira{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="telaLogin" class="login">
+  <h1>Velvet Bloom</h1>
+  <p>Painel de edição do site</p>
+  <div id="erroLogin" class="aviso erro oculto"></div>
+  <form id="formLogin">
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="bt-principal largo" id="btEntrar">Entrar</button>
+  </form>
+</div>
+
+<!-- ===================== PAINEL ===================== -->
+<div id="telaPainel" class="oculto">
+  <div class="topo">
+    <h1>Velvet Bloom <small>Editar o site</small></h1>
+    <button class="bt-claro" id="btSair">Sair</button>
+  </div>
+
+  <div class="envolve">
+    <div id="avisoTopo" class="aviso info oculto"></div>
+    <div id="secoes"></div>
+  </div>
+
+  <div class="barra">
+    <span class="estado" id="estado"></span>
+    <button class="bt-principal" id="btPublicar">Publicar alterações</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var conteudo = null;   // o content.json carregado
+  var sha = null;        // versão do arquivo, para detectar edição simultânea
+  var alterado = false;
+
+  var el = function(id){ return document.getElementById(id); };
+
+  /* ---------------------------------------------------------- utilidades */
+
+  function api(caminho, opcoes){
+    return fetch(caminho, Object.assign({ headers:{'Content-Type':'application/json'} }, opcoes))
+      .then(function(r){
+        return r.json().catch(function(){ return {}; }).then(function(dados){
+          if(!r.ok) throw new Error(dados.erro || ('Erro ' + r.status));
+          return dados;
+        });
+      });
+  }
+
+  function mostraAviso(caixa, tipo, texto){
+    caixa.className = 'aviso ' + tipo;
+    caixa.textContent = texto;
+  }
+
+  function marcaAlterado(){
+    alterado = true;
+    el('estado').textContent = 'Alterações não publicadas';
+  }
+
+  /* Lê um caminho tipo "hero.subtitulo" dentro do conteúdo. */
+  function pega(caminho){
+    return caminho.split('.').reduce(function(o,p){ return o ? o[p] : undefined; }, conteudo);
+  }
+  function poe(caminho, valor){
+    var partes = caminho.split('.');
+    var ultimo = partes.pop();
+    var alvo = partes.reduce(function(o,p){ return o[p]; }, conteudo);
+    alvo[ultimo] = valor;
+    marcaAlterado();
+  }
+
+  /* ---------------------------------------------------------- construção da tela */
+
+  function campoTexto(rotulo, caminho, opcoes){
+    opcoes = opcoes || {};
+    var div = document.createElement('div');
+    div.className = 'campo';
+
+    var lab = document.createElement('label');
+    lab.textContent = rotulo;
+    div.appendChild(lab);
+
+    var entrada = document.createElement(opcoes.longo ? 'textarea' : 'input');
+    if(!opcoes.longo) entrada.type = 'text';
+    entrada.value = pega(caminho) || '';
+    entrada.addEventListener('input', function(){ poe(caminho, entrada.value); });
+    lab.setAttribute('for', 'c_' + caminho.replace(/\./g,'_'));
+    entrada.id = 'c_' + caminho.replace(/\./g,'_');
+    div.appendChild(entrada);
+
+    if(opcoes.dica){
+      var d = document.createElement('p');
+      d.className = 'dica';
+      d.textContent = opcoes.dica;
+      div.appendChild(d);
+    }
+    return div;
+  }
+
+  /* Lista de textos simples (frases, ocasiões, selos...) */
+  function listaTextos(rotulo, caminho, dica){
+    var div = document.createElement('div');
+    div.className = 'campo';
+
+    var lab = document.createElement('label');
+    lab.textContent = rotulo;
+    div.appendChild(lab);
+
+    var caixa = document.createElement('div');
+    div.appendChild(caixa);
+
+    function redesenha(){
+      caixa.innerHTML = '';
+      var lista = pega(caminho) || [];
+      lista.forEach(function(valor, i){
+        var linha = document.createElement('div');
+        linha.className = 'item-lista';
+
+        var entrada = document.createElement('input');
+        entrada.type = 'text';
+        entrada.value = valor;
+        entrada.addEventListener('input', function(){
+          pega(caminho)[i] = entrada.value;
+          marcaAlterado();
+        });
+        linha.appendChild(entrada);
+
+        var remover = document.createElement('button');
+        remover.type = 'button';
+        remover.className = 'bt-remover';
+        remover.textContent = '✕';
+        remover.title = 'Remover';
+        remover.addEventListener('click', function(){
+          pega(caminho).splice(i,1);
+          marcaAlterado();
+          redesenha();
+        });
+        linha.appendChild(remover);
+
+        caixa.appendChild(linha);
+      });
+
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'bt-adicionar';
+      add.textContent = '+ Adicionar';
+      add.addEventListener('click', function(){
+        pega(caminho).push('');
+        marcaAlterado();
+        redesenha();
+      });
+      caixa.appendChild(add);
+    }
+    redesenha();
+
+    if(dica){
+      var d = document.createElement('p');
+      d.className = 'dica';
+      d.textContent = dica;
+      div.appendChild(d);
+    }
+    return div;
+  }
+
+  /* ---------------------------------------------------------- fotos */
+
+  /* Reduz e corta a imagem no próprio navegador antes de enviar: economiza
+     dados da cliente, mantém o enquadramento do site e evita depender de
+     processamento de imagem pago no servidor. */
+  function prepararImagem(arquivo, largura, altura){
+    return new Promise(function(resolve, reject){
+      var leitor = new FileReader();
+      leitor.onerror = function(){ reject(new Error('Não foi possível ler a imagem.')); };
+      leitor.onload = function(){
+        var img = new Image();
+        img.onerror = function(){ reject(new Error('Arquivo de imagem inválido.')); };
+        img.onload = function(){
+          var tela = document.createElement('canvas');
+          tela.width = largura; tela.height = altura;
+          var ctx = tela.getContext('2d');
+
+          /* corta pelo centro, mantendo a proporção (igual ao object-fit: cover) */
+          var escala = Math.max(largura / img.width, altura / img.height);
+          var lFinal = img.width * escala, aFinal = img.height * escala;
+          ctx.drawImage(img, (largura - lFinal)/2, (altura - aFinal)/2, lFinal, aFinal);
+
+          var dados = tela.toDataURL('image/webp', 0.82);
+          if(dados.indexOf('image/webp') === -1){        // navegador sem webp
+            dados = tela.toDataURL('image/jpeg', 0.85);
+          }
+          resolve({
+            base64: dados.split(',')[1],
+            extensao: dados.indexOf('image/webp') !== -1 ? 'webp' : 'jpg',
+            previa: dados
+          });
+        };
+        img.src = leitor.result;
+      };
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
+  /* medidas usadas em cada lugar do site */
+  var MEDIDAS = {
+    hero:     {largura:2000, altura:1333, descricao:'paisagem'},
+    cat:      {largura:900,  altura:1230, descricao:'em pé'},
+    card:     {largura:900,  altura:900,  descricao:'quadrada'},
+    essencia: {largura:900,  altura:900,  descricao:'quadrada'},
+    testi:    {largura:720,  altura:1130, descricao:'print de conversa'}
+  };
+
+  function galeriaFotos(rotulo, caminho, pasta, dica){
+    var div = document.createElement('div');
+    div.className = 'campo';
+
+    var lab = document.createElement('label');
+    lab.textContent = rotulo;
+    div.appendChild(lab);
+
+    if(dica){
+      var d = document.createElement('p');
+      d.className = 'dica';
+      d.style.marginBottom = '.6rem';
+      d.textContent = dica;
+      div.appendChild(d);
+    }
+
+    var grade = document.createElement('div');
+    grade.className = 'fotos';
+    div.appendChild(grade);
+
+    (pega(caminho) || []).forEach(function(foto, i){
+      var cartao = document.createElement('div');
+      cartao.className = 'foto';
+
+      var img = document.createElement('img');
+      img.src = '/assets/' + foto.arquivo;
+      img.alt = foto.alt || '';
+      img.loading = 'lazy';
+      cartao.appendChild(img);
+
+      var botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'trocar';
+      botao.textContent = 'Trocar foto';
+      cartao.appendChild(botao);
+
+      var entrada = document.createElement('input');
+      entrada.type = 'file';
+      entrada.accept = 'image/*';
+      entrada.className = 'oculto';
+      cartao.appendChild(entrada);
+
+      botao.addEventListener('click', function(){ entrada.click(); });
+
+      entrada.addEventListener('change', function(){
+        var arquivo = entrada.files && entrada.files[0];
+        if(!arquivo) return;
+
+        cartao.classList.add('enviando');
+        botao.textContent = 'Enviando…';
+
+        var medida = MEDIDAS[pasta] || MEDIDAS.card;
+        prepararImagem(arquivo, medida.largura, medida.altura)
+          .then(function(pronta){
+            var nome = 'foto-' + Date.now() + '.' + pronta.extensao;
+            return api('/api/imagem', {
+              method:'POST',
+              body: JSON.stringify({ pasta: pasta, nome: nome, dadosBase64: pronta.base64 })
+            }).then(function(resposta){
+              pega(caminho)[i].arquivo = resposta.caminho;
+              img.src = pronta.previa;
+              marcaAlterado();
+              botao.textContent = 'Trocar foto';
+              cartao.classList.remove('enviando');
+            });
+          })
+          .catch(function(erro){
+            botao.textContent = 'Trocar foto';
+            cartao.classList.remove('enviando');
+            mostraAviso(el('avisoTopo'), 'erro', 'Erro ao enviar a foto: ' + erro.message);
+            el('avisoTopo').classList.remove('oculto');
+          });
+      });
+
+      grade.appendChild(cartao);
+    });
+
+    return div;
+  }
+
+  /* ---------------------------------------------------------- seções */
+
+  function secao(titulo, subtitulo, montar){
+    var det = document.createElement('details');
+    det.className = 'secao';
+
+    var sum = document.createElement('summary');
+    sum.innerHTML = '<span>' + titulo + (subtitulo ? ' <span class="sub">— ' + subtitulo + '</span>' : '') + '</span>';
+    det.appendChild(sum);
+
+    var corpo = document.createElement('div');
+    corpo.className = 'corpo';
+    det.appendChild(corpo);
+
+    /* monta o conteúdo só ao abrir pela primeira vez — deixa a tela leve */
+    var montado = false;
+    det.addEventListener('toggle', function(){
+      if(det.open && !montado){ montar(corpo); montado = true; }
+    });
+
+    return det;
+  }
+
+  function montarPainel(){
+    var raiz = el('secoes');
+    raiz.innerHTML = '';
+
+    raiz.appendChild(secao('Contato e WhatsApp', 'número, Instagram', function(c){
+      c.appendChild(campoTexto('Número do WhatsApp', 'config.whatsapp',
+        {dica:'Formato internacional, só números: 55 + DDD + número. Ex.: 5551999999999'}));
+      c.appendChild(campoTexto('Endereço do Instagram', 'config.instagramUrl'));
+      c.appendChild(campoTexto('@ do Instagram', 'config.instagramHandle'));
+      c.appendChild(campoTexto('Cidade e região', 'config.regiao'));
+    }));
+
+    raiz.appendChild(secao('Tela inicial', 'o que aparece primeiro', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'hero.eyebrow'));
+      c.appendChild(listaTextos('Frase principal (uma linha por campo)', 'hero.tituloLinhas'));
+      c.appendChild(campoTexto('Texto abaixo da frase', 'hero.subtitulo', {longo:true}));
+      c.appendChild(campoTexto('Botão principal', 'hero.botaoPrimario'));
+      c.appendChild(campoTexto('Botão secundário', 'hero.botaoSecundario'));
+      c.appendChild(galeriaFotos('Fotos que giram na tela inicial', 'hero.fotos', 'hero',
+        'Funcionam melhor fotos deitadas (paisagem). A imagem é cortada e ajustada automaticamente.'));
+    }));
+
+    raiz.appendChild(secao('A essência', 'seção do vídeo e das flores', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'essencia.eyebrow'));
+      c.appendChild(campoTexto('Título', 'essencia.titulo', {longo:true, dica:'Use <br> para quebrar a linha.'}));
+      c.appendChild(listaTextos('Frases', 'essencia.frases'));
+      c.appendChild(campoTexto('Frase de fecho', 'essencia.fecho', {longo:true}));
+      c.appendChild(galeriaFotos('Galeria de flores', 'essencia.galeria', 'essencia',
+        'Fotos quadradas. Qualquer foto é cortada no quadrado automaticamente.'));
+    }));
+
+    raiz.appendChild(secao('Categorias', 'buquês, cestas, arranjos…', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'categorias.eyebrow'));
+      c.appendChild(campoTexto('Título', 'categorias.titulo'));
+      (conteudo.categorias.itens || []).forEach(function(item, i){
+        var bloco = document.createElement('div');
+        bloco.style.cssText = 'border-top:1px solid var(--linha);padding-top:1rem;margin-top:1rem;';
+        bloco.appendChild(campoTexto('Nome', 'categorias.itens.' + i + '.titulo'));
+        bloco.appendChild(campoTexto('Descrição', 'categorias.itens.' + i + '.descricao', {longo:true}));
+        bloco.appendChild(campoTexto('Mensagem que abre no WhatsApp', 'categorias.itens.' + i + '.mensagemWhatsapp', {longo:true}));
+        c.appendChild(bloco);
+      });
+      c.appendChild(galeriaFotos('Fotos das categorias', 'categorias.itens', 'cat',
+        'Na mesma ordem das categorias acima.'));
+    }));
+
+    raiz.appendChild(secao('Presentes para cada momento', 'seção do vídeo grande', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'presentes.eyebrow'));
+      c.appendChild(campoTexto('Título', 'presentes.titulo'));
+      c.appendChild(campoTexto('Descrição', 'presentes.descricao', {longo:true}));
+      c.appendChild(listaTextos('Ocasiões', 'presentes.ocasioes', 'Pode usar emoji no começo, como já está.'));
+    }));
+
+    raiz.appendChild(secao('Entrega', '', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'entrega.eyebrow'));
+      c.appendChild(campoTexto('Título', 'entrega.titulo'));
+      c.appendChild(campoTexto('Descrição', 'entrega.descricao', {longo:true}));
+      c.appendChild(listaTextos('Selos', 'entrega.selos'));
+      c.appendChild(campoTexto('Botão', 'entrega.botao'));
+    }));
+
+    raiz.appendChild(secao('Galeria', 'o catálogo de fotos', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'galeria.eyebrow'));
+      c.appendChild(campoTexto('Título', 'galeria.titulo'));
+      c.appendChild(galeriaFotos('Fotos', 'galeria.fotos', 'card', 'Fotos quadradas.'));
+    }));
+
+    raiz.appendChild(secao('Depoimentos', 'prints de clientes', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'depoimentos.eyebrow'));
+      c.appendChild(campoTexto('Título', 'depoimentos.titulo', {longo:true, dica:'Use <br> para quebrar a linha.'}));
+      c.appendChild(campoTexto('Observação abaixo', 'depoimentos.nota', {longo:true}));
+      c.appendChild(galeriaFotos('Prints', 'depoimentos.prints', 'testi',
+        'Prints de conversa, em pé. Cubra dados pessoais antes de enviar.'));
+    }));
+
+    raiz.appendChild(secao('Chamada final', 'último bloco da página', function(c){
+      c.appendChild(campoTexto('Linha de cima', 'ctaFinal.eyebrow'));
+      c.appendChild(campoTexto('Título', 'ctaFinal.titulo'));
+      c.appendChild(campoTexto('Descrição', 'ctaFinal.descricao', {longo:true}));
+      c.appendChild(campoTexto('Botão', 'ctaFinal.botao'));
+    }));
+
+    raiz.appendChild(secao('Rodapé e Google', 'textos do fim da página e busca', function(c){
+      c.appendChild(campoTexto('Frase do rodapé', 'rodape.tagline'));
+      c.appendChild(listaTextos('Informações de entrega', 'rodape.entregaLinhas'));
+      c.appendChild(campoTexto('Título no Google', 'seo.titulo',
+        {dica:'É o que aparece como título nos resultados de busca.'}));
+      c.appendChild(campoTexto('Descrição no Google', 'seo.descricao', {longo:true,
+        dica:'O textinho abaixo do título nos resultados de busca.'}));
+      c.appendChild(campoTexto('Texto de busca do rodapé', 'rodape.textoSeo', {longo:true}));
+    }));
+  }
+
+  /* ---------------------------------------------------------- publicar */
+
+  function publicar(){
+    var botao = el('btPublicar');
+    var estado = el('estado');
+    botao.disabled = true;
+    estado.innerHTML = '<span class="girando"></span> Publicando…';
+
+    api('/api/conteudo', { method:'POST', body: JSON.stringify({ conteudo: conteudo, sha: sha }) })
+      .then(function(){
+        alterado = false;
+        estado.textContent = '';
+        mostraAviso(el('avisoTopo'), 'ok',
+          'Publicado! O site fica atualizado em cerca de 1 minuto. Pode fechar esta página.');
+        el('avisoTopo').classList.remove('oculto');
+        /* recarrega o sha para permitir salvar de novo em seguida */
+        return api('/api/conteudo').then(function(dados){ sha = dados.sha; });
+      })
+      .catch(function(erro){
+        estado.textContent = '';
+        mostraAviso(el('avisoTopo'), 'erro', erro.message);
+        el('avisoTopo').classList.remove('oculto');
+      })
+      .then(function(){ botao.disabled = false; });
+  }
+
+  /* ---------------------------------------------------------- entrada */
+
+  function abrirPainel(){
+    el('telaLogin').classList.add('oculto');
+    el('telaPainel').classList.remove('oculto');
+
+    api('/api/conteudo')
+      .then(function(dados){
+        conteudo = dados.conteudo;
+        sha = dados.sha;
+        montarPainel();
+      })
+      .catch(function(erro){
+        mostraAviso(el('avisoTopo'), 'erro', 'Não foi possível carregar o conteúdo: ' + erro.message);
+        el('avisoTopo').classList.remove('oculto');
+      });
+  }
+
+  el('formLogin').addEventListener('submit', function(evento){
+    evento.preventDefault();
+    var botao = el('btEntrar');
+    var erro = el('erroLogin');
+    erro.classList.add('oculto');
+    botao.disabled = true;
+    botao.innerHTML = '<span class="girando"></span> Entrando…';
+
+    api('/api/login', { method:'POST', body: JSON.stringify({ senha: el('senha').value }) })
+      .then(abrirPainel)
+      .catch(function(e){
+        mostraAviso(erro, 'erro', e.message);
+        erro.classList.remove('oculto');
+      })
+      .then(function(){
+        botao.disabled = false;
+        botao.textContent = 'Entrar';
+      });
+  });
+
+  el('btPublicar').addEventListener('click', publicar);
+
+  el('btSair').addEventListener('click', function(){
+    api('/api/sair', {method:'POST'}).then(function(){ location.reload(); });
+  });
+
+  /* avisa se sair com alteração pendente */
+  window.addEventListener('beforeunload', function(evento){
+    if(alterado){ evento.preventDefault(); evento.returnValue = ''; }
+  });
+
+  /* já está logado? */
+  api('/api/sessao')
+    .then(function(dados){ if(dados.autenticado) abrirPainel(); })
+    .catch(function(){ /* painel ainda não configurado — mostra o login mesmo assim */ });
+})();
+</script>
+</body>
+</html>

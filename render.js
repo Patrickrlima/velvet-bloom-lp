@@ -47,55 +47,110 @@ function lookup(path, scope, root) {
   return current === null || current === undefined ? "" : current;
 }
 
+/** Vazio, zero, false, lista sem itens — tudo conta como "não tem". */
+function temValor(v) {
+  return Array.isArray(v) ? v.length > 0 : Boolean(v);
+}
+
 /**
- * Resolve os blocos {{#each}} e {{#if}} de dentro para fora. Vai atrás do
- * bloco mais interno primeiro (regex sem aninhamento do mesmo tipo), o que
- * mantém o motor simples e previsível para a estrutura deste site.
+ * Acha o PRIMEIRO bloco do tipo pedido, casando a abertura com o fechamento
+ * correto por contagem de profundidade.
+ *
+ * Expressão regular não dá conta disso: com `{{#if a}}…{{#if b}}…{{/if}}…{{/if}}`
+ * ela casaria a abertura de fora com o fechamento de dentro, embaralhando o
+ * documento. Contar profundidade é o jeito certo.
+ */
+function acharBloco(texto, tipo) {
+  const abertura = new RegExp("\\{\\{#" + tipo + "\\s+([^}]+)\\}\\}");
+  const achado = abertura.exec(texto);
+  if (!achado) return null;
+
+  const marcaAbre = "{{#" + tipo;
+  const marcaFecha = "{{/" + tipo + "}}";
+  const inicioCorpo = achado.index + achado[0].length;
+
+  let profundidade = 1;
+  let i = inicioCorpo;
+
+  while (i < texto.length) {
+    const proximaAbre = texto.indexOf(marcaAbre, i);
+    const proximaFecha = texto.indexOf(marcaFecha, i);
+    if (proximaFecha === -1) return null; // bloco sem fechamento
+
+    if (proximaAbre !== -1 && proximaAbre < proximaFecha) {
+      profundidade += 1;
+      i = proximaAbre + marcaAbre.length;
+    } else {
+      profundidade -= 1;
+      if (profundidade === 0) {
+        return {
+          inicio: achado.index,
+          fim: proximaFecha + marcaFecha.length,
+          caminho: achado[1],
+          corpo: texto.slice(inicioCorpo, proximaFecha),
+        };
+      }
+      i = proximaFecha + marcaFecha.length;
+    }
+  }
+  return null;
+}
+
+/**
+ * Resolve os blocos {{#each}}, {{#if}} e {{#unless}}, sempre do mais externo
+ * para o mais interno.
+ *
+ * Essa ordem é obrigatória por causa do {{#each}}: um laço dentro de outro só
+ * consegue ler `this` depois que o laço de fora definiu o escopo. Resolver de
+ * dentro para fora faria o interno ser avaliado num escopo onde os dados dele
+ * ainda não existem, e ele sumiria silenciosamente. O corpo de cada iteração
+ * volta para esta mesma função (recursão), já com o escopo certo.
  */
 function renderBlocks(template, scope, root, resolveAsset) {
   let output = template;
   let guard = 0;
+  let bloco;
 
-  const eachPattern = /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/;
-  const ifPattern = /\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/;
-
-  /* Os laços vêm PRIMEIRO, todos eles, e só depois os condicionais.
-     Sem isso, um {{#if}} escrito dentro de um {{#each}} seria avaliado no
-     escopo de fora (onde `this` e `@index` não existem) antes de o laço
-     rodar — e o bloco sumiria silenciosamente. Cada iteração do laço já
-     resolve os condicionais internos na chamada recursiva abaixo. */
-  while (eachPattern.test(output) && guard < 200) {
+  /* Os laços primeiro: eles definem escopo, e os condicionais escritos dentro
+     deles são resolvidos na recursão de cada iteração. */
+  while ((bloco = acharBloco(output, "each")) && guard < 300) {
     guard += 1;
+    const lista = lookup(bloco.caminho, scope, root);
+    let resultado = "";
 
-    output = output.replace(eachPattern, (_, path, body) => {
-      const list = lookup(path, scope, root);
-      if (!Array.isArray(list)) return "";
-      return list
+    if (Array.isArray(lista)) {
+      resultado = lista
         .map((item, index) => {
           const itemScope =
             item !== null && typeof item === "object"
               ? Object.assign({}, item, { __index__: index })
               : item;
-          // itens simples (strings) precisam do índice acessível de outra forma
-          const body2 = body.replace(/\{\{@index\}\}/g, String(index));
+          // itens simples (textos) precisam do índice de outra forma
+          const corpo = bloco.corpo.replace(/\{\{@index\}\}/g, String(index));
           return renderInline(
-            renderBlocks(body2, itemScope, root, resolveAsset),
+            renderBlocks(corpo, itemScope, root, resolveAsset),
             itemScope,
             root,
             resolveAsset
           );
         })
         .join("");
-    });
+    }
+    output = output.slice(0, bloco.inicio) + resultado + output.slice(bloco.fim);
   }
 
-  while (ifPattern.test(output) && guard < 400) {
+  while ((bloco = acharBloco(output, "if")) && guard < 600) {
     guard += 1;
-    output = output.replace(ifPattern, (_, path, body) => {
-      const value = lookup(path, scope, root);
-      const truthy = Array.isArray(value) ? value.length > 0 : Boolean(value);
-      return truthy ? body : "";
-    });
+    const manter = temValor(lookup(bloco.caminho, scope, root)) ? bloco.corpo : "";
+    output = output.slice(0, bloco.inicio) + manter + output.slice(bloco.fim);
+  }
+
+  /* O contrário do #if — permite pares do tipo "mostra o preço, senão mostra
+     'sob consulta'" sem precisar de um #else no motor. */
+  while ((bloco = acharBloco(output, "unless")) && guard < 900) {
+    guard += 1;
+    const manter = temValor(lookup(bloco.caminho, scope, root)) ? "" : bloco.corpo;
+    output = output.slice(0, bloco.inicio) + manter + output.slice(bloco.fim);
   }
 
   return output;

@@ -405,6 +405,46 @@
   .occasion:nth-child(3n+2){transform:rotate(.5deg);}
   .occasion:hover{transform:translateY(-3px) rotate(0);}
 
+  /* ---------- valores (seção opcional, ligada pelo painel) ----------
+     Lista no espírito de um cardápio: nome à esquerda, valor à direita,
+     unidos por um pontilhado que encolhe. Funciona bem no celular porque
+     os dois extremos continuam alinhados por mais estreita que seja a tela. */
+  .precos-lista{max-width:720px;margin-inline:auto;}
+  .preco-item{
+    display:flex;align-items:baseline;gap:.8rem;
+    padding-block:1.15rem;border-bottom:1px solid var(--bone-line);
+  }
+  .preco-item:first-child{border-top:1px solid var(--bone-line);}
+  .preco-texto{flex:0 1 auto;min-width:0;}
+  .preco-nome{font-family:var(--font-display);font-size:1.28rem;color:var(--ink);display:block;}
+  .preco-detalhe{font-size:.85rem;color:var(--ink-soft);display:block;margin-top:.15rem;}
+  .preco-pontos{
+    flex:1 1 auto;min-width:1.5rem;
+    border-bottom:1px dotted var(--bone-line);
+    transform:translateY(-.3em);
+  }
+  .preco-valor{
+    flex:none;text-align:right;
+    font-family:var(--font-display);font-style:italic;font-size:1.3rem;color:var(--velvet);
+    white-space:nowrap;
+  }
+  .preco-prefixo{
+    display:block;font-family:var(--font-body);font-style:normal;
+    font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:.1rem;
+  }
+  .preco-consulta{font-size:1rem;color:var(--ink-soft);font-style:italic;}
+  .precos-observacao{
+    max-width:720px;margin:1.6rem auto 0;
+    font-size:.82rem;color:var(--ink-soft);text-align:center;
+  }
+  .precos-acao{display:flex;justify-content:center;margin-top:var(--sp-4);}
+  @media (max-width:560px){
+    .preco-nome{font-size:1.1rem;}
+    .preco-valor{font-size:1.12rem;}
+    .preco-detalhe{font-size:.8rem;}
+  }
+
   /* ---------- presentes cine (sticky + scroll-zoom video) ---------- */
   .presentes-cine{background:var(--velvet-deep);}
   .presentes-runway{position:relative;height:440vh;}
@@ -750,6 +790,38 @@
   </div>
 </section>
 
+<!-- ======================= VALORES (opcional) =======================
+     A seção inteira só é gerada quando precos.mostrar estiver ligado no
+     painel. Desligada, ela não existe no HTML — não fica escondida por CSS.
+     Assim o Google não indexa preço que a floricultura não quer publicado. -->
+{{#if precos.mostrar}}<section class="section section-tinted" id="valores">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">{{precos.eyebrow}}</p>
+      <h2>{{precos.titulo}}</h2>
+      <p class="lead">{{precos.descricao}}</p>
+    </div>
+    <div class="precos-lista reveal d1">
+      {{#each precos.itens}}<div class="preco-item">
+        <span class="preco-texto">
+          <span class="preco-nome">{{this.nome}}</span>
+          {{#if this.detalhe}}<span class="preco-detalhe">{{this.detalhe}}</span>{{/if}}
+        </span>
+        <span class="preco-pontos" aria-hidden="true"></span>
+        <span class="preco-valor">{{#if this.valor}}<span class="preco-prefixo">{{precos.prefixo}}</span>{{precos.moeda}} {{this.valor}}{{/if}}{{#unless this.valor}}<span class="preco-consulta">{{precos.semValor}}</span>{{/unless}}</span>
+      </div>
+      {{/each}}
+    </div>
+    {{#if precos.observacao}}<p class="precos-observacao reveal d2">{{precos.observacao}}</p>{{/if}}
+    <div class="precos-acao reveal d2">
+      <a class="btn btn-gold" id="waPrecos" href="#" target="_blank" rel="noopener">
+        <span class="btn-sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c.3 0 .56.2.63.5l1.6 5.77 5.77 1.6c.3.07.5.33.5.63s-.2.56-.5.63l-5.77 1.6-1.6 5.77c-.07.3-.33.5-.63.5s-.56-.2-.63-.5l-1.6-5.77-5.77-1.6c-.3-.07-.5-.33-.5-.63s.2-.56.5-.63l5.77-1.6 1.6-5.77c.07-.3.33-.5.63-.5Z"/></svg></span>
+        {{precos.botao}}
+      </a>
+    </div>
+  </div>
+</section>
+{{/if}}
 <!-- ======================= PARA CADA MOMENTO — CINE VIDEO (sticky + scroll zoom) ======================= -->
 <section class="presentes-cine" id="presentes">
   <div class="presentes-runway" id="presentesRunway">
@@ -964,7 +1036,8 @@
     waFooter:   waLink("{{mensagensWhatsapp.waFooter}}"),
     waSocial:   waLink("{{mensagensWhatsapp.waSocial}}"),
     waMenu:     waLink("{{mensagensWhatsapp.waMenu}}"),
-    waFloat:    waLink("{{mensagensWhatsapp.waFloat}}"){{#each categorias.itens}},
+    waFloat:    waLink("{{mensagensWhatsapp.waFloat}}"){{#if precos.mostrar}},
+    waPrecos:   waLink("{{precos.mensagemWhatsapp}}"){{/if}}{{#each categorias.itens}},
     {{this.id}}: waLink("{{this.mensagemWhatsapp}}"){{/each}}
   };
   Object.keys(links).forEach(function(id){

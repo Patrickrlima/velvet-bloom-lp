@@ -78,6 +78,22 @@
   .bt-adicionar{background:transparent;border:1px dashed var(--linha);color:var(--ink-soft);
     padding:.5rem 1rem;font-size:.85rem;border-radius:var(--raio);}
 
+  /* ---------- interruptor ---------- */
+  .interruptor-rotulo{
+    display:flex;align-items:center;gap:.65rem;cursor:pointer;
+    font-size:1rem;font-weight:600;color:var(--ink);margin:0;
+  }
+  .interruptor-rotulo input{width:1.15rem;height:1.15rem;accent-color:var(--velvet);cursor:pointer;flex:none;}
+
+  /* ---------- editor de preços ---------- */
+  .preco-editor{
+    border:1px solid var(--linha);border-radius:var(--raio);
+    padding:.9rem;margin-bottom:.7rem;background:var(--bone);
+  }
+  .preco-campo{margin-bottom:.6rem;}
+  .preco-campo label{font-size:.72rem;margin-bottom:.2rem;}
+  .preco-remover{width:100%;font-size:.8rem;padding:.45rem;}
+
   /* ---------- fotos ---------- */
   .fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem;}
   .foto{position:relative;border:1px solid var(--linha);border-radius:var(--raio);overflow:hidden;background:var(--bone-deep);}
@@ -200,6 +216,39 @@
   }
 
   /* ---------------------------------------------------------- construção da tela */
+
+  /* Interruptor liga/desliga. Usado para a seção de preços: desligado, ela
+     nem é gerada no site. */
+  function campoInterruptor(rotulo, caminho, dica, aoMudar){
+    var div = document.createElement('div');
+    div.className = 'campo interruptor';
+
+    var lab = document.createElement('label');
+    lab.className = 'interruptor-rotulo';
+
+    var entrada = document.createElement('input');
+    entrada.type = 'checkbox';
+    entrada.checked = Boolean(pega(caminho));
+    entrada.addEventListener('change', function(){
+      poe(caminho, entrada.checked);
+      if(aoMudar) aoMudar(entrada.checked);
+    });
+
+    var texto = document.createElement('span');
+    texto.textContent = rotulo;
+
+    lab.appendChild(entrada);
+    lab.appendChild(texto);
+    div.appendChild(lab);
+
+    if(dica){
+      var d = document.createElement('p');
+      d.className = 'dica';
+      d.textContent = dica;
+      div.appendChild(d);
+    }
+    return div;
+  }
 
   function campoTexto(rotulo, caminho, opcoes){
     opcoes = opcoes || {};
@@ -338,6 +387,86 @@
     essencia: {largura:900,  altura:900,  descricao:'quadrada'},
     testi:    {largura:720,  altura:1130, descricao:'print de conversa'}
   };
+
+  /* Lista de preços: cada item tem nome, detalhe e valor. Deixar o valor em
+     branco é intencional — o site mostra "Sob consulta" naquele item. */
+  function listaPrecos(rotulo, caminho, dica){
+    var div = document.createElement('div');
+    div.className = 'campo';
+
+    var lab = document.createElement('label');
+    lab.textContent = rotulo;
+    div.appendChild(lab);
+
+    if(dica){
+      var d = document.createElement('p');
+      d.className = 'dica';
+      d.style.marginBottom = '.7rem';
+      d.textContent = dica;
+      div.appendChild(d);
+    }
+
+    var caixa = document.createElement('div');
+    div.appendChild(caixa);
+
+    function redesenha(){
+      caixa.innerHTML = '';
+      var lista = pega(caminho) || [];
+
+      lista.forEach(function(item, i){
+        var bloco = document.createElement('div');
+        bloco.className = 'preco-editor';
+
+        function linha(rotuloCampo, chave, placeholder){
+          var envolve = document.createElement('div');
+          envolve.className = 'preco-campo';
+          var l = document.createElement('label');
+          l.textContent = rotuloCampo;
+          var e = document.createElement('input');
+          e.type = 'text';
+          e.value = item[chave] || '';
+          if(placeholder) e.placeholder = placeholder;
+          e.addEventListener('input', function(){
+            pega(caminho)[i][chave] = e.value;
+            marcaAlterado();
+          });
+          envolve.appendChild(l);
+          envolve.appendChild(e);
+          return envolve;
+        }
+
+        bloco.appendChild(linha('Item', 'nome', 'Ex.: 🌹 Buquês'));
+        bloco.appendChild(linha('Descrição', 'detalhe', 'Ex.: Rosas, lírios e mistos'));
+        bloco.appendChild(linha('Valor', 'valor', 'Ex.: 89,00 — em branco = Sob consulta'));
+
+        var remover = document.createElement('button');
+        remover.type = 'button';
+        remover.className = 'bt-remover preco-remover';
+        remover.textContent = '✕ Remover item';
+        remover.addEventListener('click', function(){
+          pega(caminho).splice(i,1);
+          marcaAlterado();
+          redesenha();
+        });
+        bloco.appendChild(remover);
+
+        caixa.appendChild(bloco);
+      });
+
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'bt-adicionar';
+      add.textContent = '+ Adicionar item';
+      add.addEventListener('click', function(){
+        pega(caminho).push({nome:'', detalhe:'', valor:''});
+        marcaAlterado();
+        redesenha();
+      });
+      caixa.appendChild(add);
+    }
+    redesenha();
+    return div;
+  }
 
   function galeriaFotos(rotulo, caminho, pasta, dica){
     var div = document.createElement('div');
@@ -486,6 +615,30 @@
       });
       c.appendChild(galeriaFotos('Fotos das categorias', 'categorias.itens', 'cat',
         'Na mesma ordem das categorias acima.'));
+    }));
+
+    raiz.appendChild(secao('Valores', 'seção opcional de preços', function(c){
+      var camposPrecos = document.createElement('div');
+
+      c.appendChild(campoInterruptor(
+        'Mostrar a seção de valores no site',
+        'precos.mostrar',
+        'Desligado, a seção some do site por completo — ela nem chega a ser publicada. Ligue só quando os valores estiverem conferidos.',
+        function(ligado){ camposPrecos.style.display = ligado ? '' : 'none'; }
+      ));
+
+      camposPrecos.style.display = conteudo.precos && conteudo.precos.mostrar ? '' : 'none';
+      camposPrecos.appendChild(campoTexto('Linha de cima', 'precos.eyebrow'));
+      camposPrecos.appendChild(campoTexto('Título', 'precos.titulo'));
+      camposPrecos.appendChild(campoTexto('Descrição', 'precos.descricao', {longo:true}));
+      camposPrecos.appendChild(campoTexto('Texto antes do valor', 'precos.prefixo',
+        {dica:'Aparece pequeno acima do preço. Ex.: "A partir de".'}));
+      camposPrecos.appendChild(listaPrecos('Itens e valores', 'precos.itens',
+        'Deixe o valor em branco para o item aparecer como "Sob consulta".'));
+      camposPrecos.appendChild(campoTexto('Observação abaixo da lista', 'precos.observacao', {longo:true}));
+      camposPrecos.appendChild(campoTexto('Botão', 'precos.botao'));
+      camposPrecos.appendChild(campoTexto('Mensagem que abre no WhatsApp', 'precos.mensagemWhatsapp', {longo:true}));
+      c.appendChild(camposPrecos);
     }));
 
     raiz.appendChild(secao('Presentes para cada momento', 'seção do vídeo grande', function(c){

@@ -88,8 +88,27 @@
   /* ---------- editor de preços ---------- */
   .preco-editor{
     border:1px solid var(--linha);border-radius:var(--raio);
-    padding:.9rem;margin-bottom:.7rem;background:var(--bone);
+    margin-bottom:.5rem;background:var(--bone);overflow:hidden;
   }
+  .preco-editor > summary{
+    padding:.7rem .85rem;cursor:pointer;list-style:none;
+    display:flex;align-items:baseline;gap:.6rem;justify-content:space-between;
+  }
+  .preco-editor > summary::-webkit-details-marker{display:none;}
+  .preco-editor > summary::after{content:"▾";color:var(--ink-soft);font-size:.8rem;flex:none;}
+  .preco-editor[open] > summary::after{content:"▴";}
+  .preco-editor > summary:hover{background:var(--bone-deep);}
+  .preco-resumo-nome{font-weight:600;font-size:.92rem;flex:0 1 auto;min-width:0;}
+  .preco-resumo-valor{
+    font-size:.8rem;color:var(--velvet);text-align:right;flex:0 1 auto;min-width:0;
+  }
+  .preco-corpo{padding:.85rem;border-top:1px solid var(--linha);background:#fff;}
+  .preco-acoes{display:flex;gap:.4rem;align-items:stretch;}
+  .bt-mover{
+    background:transparent;border:1px solid var(--linha);color:var(--ink-soft);
+    border-radius:var(--raio);padding:.45rem .7rem;font-size:.9rem;line-height:1;flex:none;
+  }
+  .bt-mover:hover:not(:disabled){background:var(--bone-deep);color:var(--velvet);}
   .preco-campo{margin-bottom:.6rem;}
   .preco-campo label{font-size:.72rem;margin-bottom:.2rem;}
   .preco-previa{
@@ -97,7 +116,7 @@
     border-left:3px solid var(--velvet);background:#fff;border-radius:4px;
     font-size:.8rem;
   }
-  .preco-remover{width:100%;font-size:.8rem;padding:.45rem;}
+  .preco-remover{flex:1;font-size:.8rem;padding:.45rem;}
 
   /* ---------- fotos ---------- */
   .fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem;}
@@ -499,8 +518,24 @@
       var lista = pega(caminho) || [];
 
       lista.forEach(function(item, i){
-        var bloco = document.createElement('div');
+        /* Cada produto é uma gaveta fechada. Com 4 produtos daria no mesmo;
+           com 15 é o que separa uma lista de uma rolagem infinita — a pessoa
+           vê todos os nomes e preços de uma vez e abre só o que vai mexer. */
+        var bloco = document.createElement('details');
         bloco.className = 'preco-editor';
+
+        var resumo = document.createElement('summary');
+        var resumoNome = document.createElement('span');
+        resumoNome.className = 'preco-resumo-nome';
+        var resumoValor = document.createElement('span');
+        resumoValor.className = 'preco-resumo-valor';
+        resumo.appendChild(resumoNome);
+        resumo.appendChild(resumoValor);
+        bloco.appendChild(resumo);
+
+        var corpo = document.createElement('div');
+        corpo.className = 'preco-corpo';
+        bloco.appendChild(corpo);
 
         /* Mostra em tempo real como a linha da direita vai aparecer no site.
            É o jeito mais honesto de explicar a regra "valor antigo preenchido
@@ -525,6 +560,10 @@
             texto = moeda + ' ' + atual.valor;
           }
           previa.textContent = 'No site vai aparecer: ' + texto;
+          /* o mesmo texto alimenta o resumo da gaveta fechada, para a lista
+             inteira poder ser conferida sem abrir produto por produto */
+          resumoNome.textContent = atual.nome || 'Produto sem nome';
+          resumoValor.textContent = texto;
         }
 
         function linha(rotuloCampo, chave, placeholder){
@@ -546,38 +585,82 @@
           return envolve;
         }
 
-        bloco.appendChild(linha('Item', 'nome', 'Ex.: 🌹 Buquês'));
-        bloco.appendChild(linha('Descrição', 'detalhe', 'Ex.: Rosas, lírios e mistos'));
-        bloco.appendChild(linha('Texto antes do valor (opcional)', 'prefixo',
+        corpo.appendChild(linha('Item', 'nome', 'Ex.: 🌹 Buquês'));
+        corpo.appendChild(linha('Descrição', 'detalhe', 'Ex.: Rosas, lírios e mistos'));
+        corpo.appendChild(linha('Texto antes do valor (opcional)', 'prefixo',
           'Ex.: A partir de — em branco = só o valor'));
-        bloco.appendChild(linha('Valor antigo (só para promoção)', 'valorAntigo',
+        corpo.appendChild(linha('Valor antigo (só para promoção)', 'valorAntigo',
           'Ex.: 99,00 — em branco = sem promoção'));
-        bloco.appendChild(linha('Valor', 'valor', 'Ex.: 89,00 — em branco = Sob consulta'));
+        corpo.appendChild(linha('Valor', 'valor', 'Ex.: 89,00 — em branco = Sob consulta'));
         atualizaPrevia();
-        bloco.appendChild(previa);
+        corpo.appendChild(previa);
+
+        /* Mover é o que salva a lista quando ela cresce: o produto novo nasce
+           no fim, e é daqui que ele sobe até o lugar certo. */
+        var acoes = document.createElement('div');
+        acoes.className = 'preco-acoes';
+
+        function mover(de, para){
+          var lista = pega(caminho);
+          lista.splice(para, 0, lista.splice(de, 1)[0]);
+          marcaAlterado();
+          redesenha();
+        }
+
+        var sobe = document.createElement('button');
+        sobe.type = 'button';
+        sobe.className = 'bt-mover';
+        sobe.textContent = '↑';
+        sobe.title = 'Subir na lista';
+        sobe.setAttribute('aria-label', 'Subir este produto na lista');
+        sobe.disabled = i === 0;
+        sobe.addEventListener('click', function(){ mover(i, i - 1); });
+
+        var desce = document.createElement('button');
+        desce.type = 'button';
+        desce.className = 'bt-mover';
+        desce.textContent = '↓';
+        desce.title = 'Descer na lista';
+        desce.setAttribute('aria-label', 'Descer este produto na lista');
+        desce.disabled = i === lista.length - 1;
+        desce.addEventListener('click', function(){ mover(i, i + 1); });
 
         var remover = document.createElement('button');
         remover.type = 'button';
         remover.className = 'bt-remover preco-remover';
-        remover.textContent = '✕ Remover item';
+        remover.textContent = '✕ Remover produto';
         remover.addEventListener('click', function(){
           pega(caminho).splice(i,1);
           marcaAlterado();
           redesenha();
         });
-        bloco.appendChild(remover);
+
+        acoes.appendChild(sobe);
+        acoes.appendChild(desce);
+        acoes.appendChild(remover);
+        corpo.appendChild(acoes);
 
         caixa.appendChild(bloco);
       });
 
       var add = document.createElement('button');
       add.type = 'button';
-      add.className = 'bt-adicionar';
-      add.textContent = '+ Adicionar item';
+      add.className = 'bt-adicionar largo';
+      add.textContent = '+ Adicionar produto';
       add.addEventListener('click', function(){
         pega(caminho).push({nome:'', detalhe:'', prefixo:'', valorAntigo:'', valor:''});
         marcaAlterado();
         redesenha();
+        /* o produto novo nasce no fim e já abre — senão a pessoa clica em
+           "adicionar" e parece que nada aconteceu */
+        var gavetas = caixa.querySelectorAll('.preco-editor');
+        var ultima = gavetas[gavetas.length - 1];
+        if(ultima){
+          ultima.open = true;
+          ultima.scrollIntoView({behavior:'smooth', block:'center'});
+          var primeiro = ultima.querySelector('input');
+          if(primeiro) primeiro.focus();
+        }
       });
       caixa.appendChild(add);
     }
@@ -718,7 +801,11 @@
         ['Texto antes do valor (opcional)', 'Vale item por item. Escrevendo "A partir de", o site mostra <span class="exemplo">A partir de R$ 89,00</span>. Em branco, mostra só <span class="exemplo">R$ 89,00</span>.'],
         ['Valor antigo (só para promoção)', 'Preencha e o item vira promoção: <span class="exemplo">de R$ 179,00 por R$ 149,00</span>, com o valor antigo riscado. Para encerrar a promoção, é só apagar esse campo.'],
         ['Valor em branco', 'O item aparece no site como "Sob consulta".'],
-        ['A linha de prévia', 'Embaixo de cada produto tem uma linha mostrando exatamente como o preço vai sair no site. Ela muda enquanto você digita — use para conferir antes de publicar.']
+        ['A linha de prévia', 'Dentro de cada produto tem uma linha mostrando exatamente como o preço vai sair no site. Ela muda enquanto você digita — use para conferir antes de publicar.'],
+        ['+ Adicionar produto', 'Cria um produto novo no fim da lista e já abre para preencher. Pode cadastrar quantos quiser.'],
+        ['As setas ↑ ↓', 'Mudam a posição do produto na lista do site. O produto novo nasce no fim — use as setas para levá-lo ao lugar certo.'],
+        ['No site, cada linha é clicável', 'O cliente clica no produto e o WhatsApp abre com o nome e o preço daquele produto já escritos. O texto dessa mensagem é o campo "Mensagem ao clicar num produto", onde <span class="exemplo">{produto}</span> e <span class="exemplo">{valor}</span> são trocados automaticamente.'],
+        ['Lista grande', 'A partir de 8 produtos o site mostra os 6 primeiros e guarda o resto atrás de um botão "Ver mais". A ordem aqui decide quais aparecem primeiro — deixe no topo os que mais vendem e as promoções.']
       ]
     },
     {
@@ -983,6 +1070,10 @@
         'Cada item é livre: o "texto antes do valor" é opcional e aparece na mesma linha do preço. ' +
         'Para fazer uma promoção, preencha o valor antigo — o site mostra "de R$ 99,00 por R$ 89,00" com o antigo riscado. ' +
         'Deixe o valor em branco para o item aparecer como "Sob consulta".'));
+      camposPrecos.appendChild(campoTexto('Mensagem ao clicar num produto', 'precos.mensagemItem',
+        {longo:true, dica:'Cada linha da lista é clicável e abre o WhatsApp. Escreva {produto} e {valor} no texto — eles viram o nome e o preço do produto que o cliente clicou.'}));
+      camposPrecos.appendChild(campoTexto('Palavra do selo de promoção', 'precos.rotuloPromocao',
+        {dica:'A etiqueta que aparece ao lado do nome quando o produto está em promoção.'}));
       camposPrecos.appendChild(campoTexto('Observação abaixo da lista', 'precos.observacao', {longo:true}));
       camposPrecos.appendChild(campoTexto('Botão', 'precos.botao'));
       camposPrecos.appendChild(campoTexto('Mensagem que abre no WhatsApp', 'precos.mensagemWhatsapp', {longo:true}));

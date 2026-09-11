@@ -410,13 +410,31 @@
      unidos por um pontilhado que encolhe. Funciona bem no celular porque
      os dois extremos continuam alinhados por mais estreita que seja a tela. */
   .precos-lista{max-width:720px;margin-inline:auto;}
+  /* A linha inteira é um link de WhatsApp: quem já viu o preço e gostou não
+     precisa rolar até o botão do fim da seção. Por isso o padding lateral
+     negativo — a área clicável passa um pouco das bordas do texto, que é o
+     que faz o toque no celular acertar de primeira. */
   .preco-item{
     display:flex;align-items:baseline;gap:.8rem;
     padding-block:1.15rem;border-bottom:1px solid var(--bone-line);
+    color:inherit;text-decoration:none;
+    padding-inline:.6rem;margin-inline:-.6rem;border-radius:8px;
+    transition:background-color .18s ease;
   }
   .preco-item:first-child{border-top:1px solid var(--bone-line);}
+  .preco-item:hover,.preco-item:focus-visible{background:rgba(125,31,61,.05);}
+  .preco-item:hover .preco-nome{text-decoration:underline;text-underline-offset:3px;}
+  .preco-item:focus-visible{outline:2px solid var(--velvet);outline-offset:2px;}
+  .preco-selo{
+    display:inline-block;vertical-align:middle;margin-left:.5rem;
+    background:var(--velvet);color:#fff;
+    font-family:var(--font-body);font-size:.62rem;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;
+    padding:.16rem .45rem;border-radius:999px;
+  }
   .preco-texto{flex:0 1 auto;min-width:0;}
-  .preco-nome{font-family:var(--font-display);font-size:1.28rem;color:var(--ink);display:block;}
+  /* inline-block (e não block) para o selo "Promoção" caber ao lado do nome */
+  .preco-nome{font-family:var(--font-display);font-size:1.28rem;color:var(--ink);display:inline-block;}
   .preco-detalhe{font-size:.85rem;color:var(--ink-soft);display:block;margin-top:.15rem;}
   .preco-pontos{
     flex:1 1 auto;min-width:1.5rem;
@@ -451,6 +469,19 @@
     max-width:720px;margin:1.6rem auto 0;
     font-size:.82rem;color:var(--ink-soft);text-align:center;
   }
+  /* `!important` de propósito: no celular a regra `.preco-item{display:block}`
+     vem depois, na media query, e venceria esta aqui — os itens dobrados
+     continuariam ocupando a tela. */
+  .preco-oculto{display:none !important;}
+  .precos-mais{
+    display:block;margin:1.1rem auto 0;
+    background:transparent;border:1px solid var(--bone-line);border-radius:999px;
+    padding:.55rem 1.3rem;cursor:pointer;
+    font-family:var(--font-body);font-size:.85rem;font-weight:600;
+    color:var(--velvet);letter-spacing:.02em;
+    transition:background-color .18s ease,border-color .18s ease;
+  }
+  .precos-mais:hover{background:rgba(125,31,61,.06);border-color:var(--velvet);}
   .precos-acao{display:flex;justify-content:center;margin-top:var(--sp-4);}
   @media (max-width:560px){
     .preco-nome{font-size:1.1rem;}
@@ -823,14 +854,17 @@
       <p class="lead">{{precos.descricao}}</p>
     </div>
     <div class="precos-lista reveal d1">
-      {{#each precos.itens}}<div class="preco-item">
+      {{#each precos.itens}}<a class="preco-item" href="#" target="_blank" rel="noopener"
+         data-preco-wa data-produto="{{this.nome}}"
+         data-valor="{{#if this.valor}}{{precos.moeda}} {{this.valor}}{{/if}}{{#unless this.valor}}{{precos.semValor}}{{/unless}}">
         <span class="preco-texto">
           <span class="preco-nome">{{this.nome}}</span>
+          {{#if this.valorAntigo}}<span class="preco-selo">{{precos.rotuloPromocao}}</span>{{/if}}
           {{#if this.detalhe}}<span class="preco-detalhe">{{this.detalhe}}</span>{{/if}}
         </span>
         <span class="preco-pontos" aria-hidden="true"></span>
         <span class="preco-valor">{{#if this.valor}}{{#if this.valorAntigo}}<span class="preco-antes"><span class="preco-rotulo">{{precos.rotuloDe}}</span> <span class="preco-antigo">{{precos.moeda}} {{this.valorAntigo}}</span></span> {{/if}}{{#unless this.valorAntigo}}{{#if this.prefixo}}<span class="preco-prefixo">{{this.prefixo}}</span> {{/if}}{{/unless}}<span class="preco-atual">{{#if this.valorAntigo}}<span class="preco-rotulo">{{precos.rotuloPor}}</span> {{/if}}{{precos.moeda}} {{this.valor}}</span>{{/if}}{{#unless this.valor}}<span class="preco-consulta">{{precos.semValor}}</span>{{/unless}}</span>
-      </div>
+      </a>
       {{/each}}
     </div>
     {{#if precos.observacao}}<p class="precos-observacao reveal d2">{{precos.observacao}}</p>{{/if}}
@@ -1046,8 +1080,14 @@
      --------------------------------------------------------------- */
   var WHATSAPP_NUMBER = "{{config.whatsapp}}";
 
+  /* As mensagens chegam aqui com escape de HTML (é o que impede que um texto
+     do painel quebre este script). Antes de mandar para o WhatsApp, desfaz o
+     escape — senão um apóstrofo viraria "&#39;" dentro da conversa. */
+  var decodificador = document.createElement("textarea");
+  function textoPuro(t){ decodificador.innerHTML = t; return decodificador.value; }
+
   function waLink(msg){
-    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(textoPuro(msg));
   }
   var links = {
     waNav:      waLink("{{mensagensWhatsapp.waNav}}"),
@@ -1065,6 +1105,53 @@
     var el = document.getElementById(id);
     if(el){ el.setAttribute("href", links[id]); }
   });
+
+  /* Cada linha da tabela de valores vira um link de WhatsApp com o nome e o
+     preço daquele produto já escritos na mensagem. Aqui é por data-attribute,
+     e não por id como acima, porque a quantidade de produtos é livre: a
+     floricultura pode ter 4 ou 40, e nada no código precisa saber quantos. */
+  (function ligarPrecos(){
+    var modelo = "{{precos.mensagemItem}}";
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-preco-wa]"),
+      function(linha){
+        var msg = modelo
+          .replace(/\{produto\}/g, linha.getAttribute("data-produto") || "")
+          .replace(/\{valor\}/g,   linha.getAttribute("data-valor")   || "");
+        linha.setAttribute("href", waLink(msg));
+      }
+    );
+  })();
+
+  /* Lista de valores longa: mostra as 6 primeiras e guarda o resto atrás de um
+     botão. É feito aqui, em JavaScript, e não no template, porque assim nada
+     precisa saber quantos produtos existem — a floricultura cadastra quantos
+     quiser e a seção nunca vira uma parede de texto no meio da página.
+     Sem JavaScript a lista aparece inteira, que é o pior caso aceitável. */
+  (function dobrarPrecos(){
+    var VISIVEIS = 6;
+    var lista = document.querySelector(".precos-lista");
+    if(!lista) return;
+    var itens = lista.querySelectorAll(".preco-item");
+    if(itens.length <= VISIVEIS + 1) return;   // por 1 item só não vale esconder
+
+    var escondidos = Array.prototype.slice.call(itens, VISIVEIS);
+    escondidos.forEach(function(n){ n.classList.add("preco-oculto"); });
+
+    var botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "precos-mais";
+    botao.setAttribute("aria-expanded", "false");
+    botao.textContent = "Ver mais " + escondidos.length + " opções";
+    botao.addEventListener("click", function(){
+      var abrindo = botao.getAttribute("aria-expanded") === "false";
+      escondidos.forEach(function(n){ n.classList.toggle("preco-oculto", !abrindo); });
+      botao.setAttribute("aria-expanded", abrindo ? "true" : "false");
+      botao.textContent = abrindo ? "Ver menos" : "Ver mais " + escondidos.length + " opções";
+      if(!abrindo) lista.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    lista.parentNode.insertBefore(botao, lista.nextSibling);
+  })();
 
   /* Prova social: marquee infinito conduzido por rAF, medindo a largura real
      do primeiro grupo de cartões e enrolando (modulo) nesse valor — assim o

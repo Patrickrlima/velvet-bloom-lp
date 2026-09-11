@@ -92,6 +92,11 @@
   }
   .preco-campo{margin-bottom:.6rem;}
   .preco-campo label{font-size:.72rem;margin-bottom:.2rem;}
+  .preco-previa{
+    margin:.1rem 0 .7rem;padding:.5rem .6rem;
+    border-left:3px solid var(--velvet);background:#fff;border-radius:4px;
+    font-size:.8rem;
+  }
   .preco-remover{width:100%;font-size:.8rem;padding:.45rem;}
 
   /* ---------- fotos ---------- */
@@ -417,6 +422,31 @@
         var bloco = document.createElement('div');
         bloco.className = 'preco-editor';
 
+        /* Mostra em tempo real como a linha da direita vai aparecer no site.
+           É o jeito mais honesto de explicar a regra "valor antigo preenchido
+           = promoção" sem um parágrafo de instruções. */
+        var previa = document.createElement('p');
+        previa.className = 'dica preco-previa';
+
+        function atualizaPrevia(){
+          var atual  = pega(caminho)[i];
+          var moeda  = pega('precos.moeda') || 'R$';
+          var deTxt  = pega('precos.rotuloDe') || 'de';
+          var porTxt = pega('precos.rotuloPor') || 'por';
+          var texto;
+          if(!atual.valor){
+            texto = pega('precos.semValor') || 'Sob consulta';
+          } else if(atual.valorAntigo){
+            texto = deTxt + ' ' + moeda + ' ' + atual.valorAntigo +
+                    ' ' + porTxt + ' ' + moeda + ' ' + atual.valor;
+          } else if(atual.prefixo){
+            texto = atual.prefixo + ' ' + moeda + ' ' + atual.valor;
+          } else {
+            texto = moeda + ' ' + atual.valor;
+          }
+          previa.textContent = 'No site vai aparecer: ' + texto;
+        }
+
         function linha(rotuloCampo, chave, placeholder){
           var envolve = document.createElement('div');
           envolve.className = 'preco-campo';
@@ -428,6 +458,7 @@
           if(placeholder) e.placeholder = placeholder;
           e.addEventListener('input', function(){
             pega(caminho)[i][chave] = e.value;
+            atualizaPrevia();
             marcaAlterado();
           });
           envolve.appendChild(l);
@@ -437,7 +468,13 @@
 
         bloco.appendChild(linha('Item', 'nome', 'Ex.: 🌹 Buquês'));
         bloco.appendChild(linha('Descrição', 'detalhe', 'Ex.: Rosas, lírios e mistos'));
+        bloco.appendChild(linha('Texto antes do valor (opcional)', 'prefixo',
+          'Ex.: A partir de — em branco = só o valor'));
+        bloco.appendChild(linha('Valor antigo (só para promoção)', 'valorAntigo',
+          'Ex.: 99,00 — em branco = sem promoção'));
         bloco.appendChild(linha('Valor', 'valor', 'Ex.: 89,00 — em branco = Sob consulta'));
+        atualizaPrevia();
+        bloco.appendChild(previa);
 
         var remover = document.createElement('button');
         remover.type = 'button';
@@ -458,7 +495,7 @@
       add.className = 'bt-adicionar';
       add.textContent = '+ Adicionar item';
       add.addEventListener('click', function(){
-        pega(caminho).push({nome:'', detalhe:'', valor:''});
+        pega(caminho).push({nome:'', detalhe:'', prefixo:'', valorAntigo:'', valor:''});
         marcaAlterado();
         redesenha();
       });
@@ -631,9 +668,9 @@
       camposPrecos.appendChild(campoTexto('Linha de cima', 'precos.eyebrow'));
       camposPrecos.appendChild(campoTexto('Título', 'precos.titulo'));
       camposPrecos.appendChild(campoTexto('Descrição', 'precos.descricao', {longo:true}));
-      camposPrecos.appendChild(campoTexto('Texto antes do valor', 'precos.prefixo',
-        {dica:'Aparece pequeno acima do preço. Ex.: "A partir de".'}));
       camposPrecos.appendChild(listaPrecos('Itens e valores', 'precos.itens',
+        'Cada item é livre: o "texto antes do valor" é opcional e aparece na mesma linha do preço. ' +
+        'Para fazer uma promoção, preencha o valor antigo — o site mostra "de R$ 99,00 por R$ 89,00" com o antigo riscado. ' +
         'Deixe o valor em branco para o item aparecer como "Sob consulta".'));
       camposPrecos.appendChild(campoTexto('Observação abaixo da lista', 'precos.observacao', {longo:true}));
       camposPrecos.appendChild(campoTexto('Botão', 'precos.botao'));

@@ -8,6 +8,7 @@
     "cidade": "Imbé",
     "regiao": "Imbé — Litoral Norte do RS"
   },
+
   "seo": {
     "titulo": "Velvet Bloom Flores & Presentes | Floricultura em Imbé - RS",
     "descricao": "Flores, buquês, cestas e presentes especiais em Imbé, Litoral Norte do RS. Entregas todos os dias. Peça agora pelo WhatsApp e transforme um momento em memória.",
@@ -15,84 +16,39 @@
     "ogTitulo": "Velvet Bloom Flores & Presentes | Floricultura em Imbé - RS",
     "ogDescricao": "Flores, cestas e presentes especiais para transformar momentos em memórias. Entregas todos os dias em Imbé e região."
   },
+
   "menu": [
-    {
-      "rotulo": "Início",
-      "ancora": "#inicio",
-      "noRodape": true
-    },
-    {
-      "rotulo": "Flores",
-      "ancora": "#flores",
-      "noRodape": true
-    },
-    {
-      "rotulo": "Presentes",
-      "ancora": "#presentes",
-      "noRodape": true
-    },
-    {
-      "rotulo": "Momentos",
-      "ancora": "#momentos",
-      "noRodape": true
-    },
-    {
-      "rotulo": "Entrega",
-      "ancora": "#entrega",
-      "noRodape": true
-    },
-    {
-      "rotulo": "Contato",
-      "ancora": "#contato",
-      "noRodape": false
-    }
+    { "rotulo": "Início", "ancora": "#inicio", "noRodape": true },
+    { "rotulo": "Flores", "ancora": "#flores", "noRodape": true },
+    { "rotulo": "Presentes", "ancora": "#presentes", "noRodape": true },
+    { "rotulo": "Momentos", "ancora": "#momentos", "noRodape": true },
+    { "rotulo": "Entrega", "ancora": "#entrega", "noRodape": true },
+    { "rotulo": "Contato", "ancora": "#contato", "noRodape": false }
   ],
+
   "topo": {
     "botaoVerPresentes": "Ver presentes",
     "botaoWhatsapp": "Pedir no WhatsApp"
   },
+
   "hero": {
     "eyebrow": "Floricultura em Imbé · Litoral Norte do RS",
-    "tituloLinhas": [
-      "Um presente.",
-      "Um gesto.",
-      "Uma memória."
-    ],
+    "tituloLinhas": ["Um presente.", "Um gesto.", "Uma memória."],
     "subtitulo": "Flores, cestas e presentes especiais para transformar momentos em memórias.",
     "botaoPrimario": "Quero surpreender alguém 💐",
     "botaoSecundario": "Conhecer nossos presentes",
     "indicadorRolagem": "Role a página",
     "fotos": [
-      {
-        "arquivo": "hero/rose-black.webp",
-        "alt": "Rosa vermelha coberta de orvalho sobre fundo preto"
-      },
-      {
-        "arquivo": "hero/tulips.webp",
-        "alt": "Campo de tulipas coral e creme"
-      },
-      {
-        "arquivo": "hero/roses-pink.webp",
-        "alt": "Buquê de rosas cor-de-rosa"
-      },
-      {
-        "arquivo": "hero/rose-dark.webp",
-        "alt": "Girassol em close-up ao entardecer"
-      },
-      {
-        "arquivo": "hero/strawflower.webp",
-        "alt": "Flor papel-de-seda rosa"
-      },
-      {
-        "arquivo": "hero/daisy-purple.webp",
-        "alt": "Margarida lilás em close-up"
-      },
-      {
-        "arquivo": "hero/roses-field.webp",
-        "alt": "Roseiral florido a perder de vista"
-      }
+      { "arquivo": "hero/rose-black.webp", "alt": "Rosa vermelha coberta de orvalho sobre fundo preto" },
+      { "arquivo": "hero/tulips.webp", "alt": "Campo de tulipas coral e creme" },
+      { "arquivo": "hero/roses-pink.webp", "alt": "Buquê de rosas cor-de-rosa" },
+      { "arquivo": "hero/rose-dark.webp", "alt": "Girassol em close-up ao entardecer" },
+      { "arquivo": "hero/strawflower.webp", "alt": "Flor papel-de-seda rosa" },
+      { "arquivo": "hero/daisy-purple.webp", "alt": "Margarida lilás em close-up" },
+      { "arquivo": "hero/roses-field.webp", "alt": "Roseiral florido a perder de vista" }
     ]
   },
+
   "essencia": {
     "eyebrow": "A essência Velvet Bloom",
     "titulo": "Mais do que flores.<br>Um jeito de dizer o que as palavras não conseguem.",
@@ -108,56 +64,21 @@
     "video": "vid/essencia.mp4",
     "videoPoster": "vid/essencia_poster.webp",
     "galeria": [
-      {
-        "arquivo": "essencia/ess_01.webp",
-        "alt": "Rosa cor-de-rosa vibrante coberta de orvalho, still editorial Velvet Bloom"
-      },
-      {
-        "arquivo": "essencia/ess_02.webp",
-        "alt": "Cravo-silvestre rosa em destaque sobre fundo escuro"
-      },
-      {
-        "arquivo": "essencia/ess_03.webp",
-        "alt": "Rosa laranja e amarela em tom de pôr do sol"
-      },
-      {
-        "arquivo": "essencia/ess_04.webp",
-        "alt": "Dália laranja em close-up, pétalas em camadas"
-      },
-      {
-        "arquivo": "essencia/ess_05.webp",
-        "alt": "Buquê de rosas cor-de-rosa desabrochadas"
-      },
-      {
-        "arquivo": "essencia/ess_06.webp",
-        "alt": "Rosas laranja em still fechado, textura aveludada das pétalas"
-      },
-      {
-        "arquivo": "essencia/ess_07.webp",
-        "alt": "Dália lilás com botão fechado ao lado, still editorial"
-      },
-      {
-        "arquivo": "essencia/ess_08.webp",
-        "alt": "Kalanchoe laranja em flor, still contra fundo escuro"
-      },
-      {
-        "arquivo": "essencia/ess_09.webp",
-        "alt": "Centáurea azul silvestre entre espigas de trigo"
-      },
-      {
-        "arquivo": "essencia/ess_10.webp",
-        "alt": "Flor-trombeta vermelha entre folhagem verde-escura"
-      },
-      {
-        "arquivo": "essencia/ess_11.webp",
-        "alt": "Variedade colorida de flores frescas do catálogo Velvet Bloom, agrupadas"
-      },
-      {
-        "arquivo": "essencia/ess_12.webp",
-        "alt": "Lírio-da-chuva rosa coberto de orvalho, still editorial Velvet Bloom"
-      }
+      { "arquivo": "essencia/ess_01.webp", "alt": "Rosa cor-de-rosa vibrante coberta de orvalho, still editorial Velvet Bloom" },
+      { "arquivo": "essencia/ess_02.webp", "alt": "Cravo-silvestre rosa em destaque sobre fundo escuro" },
+      { "arquivo": "essencia/ess_03.webp", "alt": "Rosa laranja e amarela em tom de pôr do sol" },
+      { "arquivo": "essencia/ess_04.webp", "alt": "Dália laranja em close-up, pétalas em camadas" },
+      { "arquivo": "essencia/ess_05.webp", "alt": "Buquê de rosas cor-de-rosa desabrochadas" },
+      { "arquivo": "essencia/ess_06.webp", "alt": "Rosas laranja em still fechado, textura aveludada das pétalas" },
+      { "arquivo": "essencia/ess_07.webp", "alt": "Dália lilás com botão fechado ao lado, still editorial" },
+      { "arquivo": "essencia/ess_08.webp", "alt": "Kalanchoe laranja em flor, still contra fundo escuro" },
+      { "arquivo": "essencia/ess_09.webp", "alt": "Centáurea azul silvestre entre espigas de trigo" },
+      { "arquivo": "essencia/ess_10.webp", "alt": "Flor-trombeta vermelha entre folhagem verde-escura" },
+      { "arquivo": "essencia/ess_11.webp", "alt": "Variedade colorida de flores frescas do catálogo Velvet Bloom, agrupadas" },
+      { "arquivo": "essencia/ess_12.webp", "alt": "Lírio-da-chuva rosa coberto de orvalho, still editorial Velvet Bloom" }
     ]
   },
+
   "categorias": {
     "eyebrow": "O que você pode encontrar",
     "titulo": "Escolha o jeito de presentear",
@@ -200,45 +121,27 @@
       }
     ]
   },
+
   "precos": {
-    "mostrar": true,
+    "mostrar": false,
     "eyebrow": "Valores",
     "titulo": "Quanto custa presentear",
     "descricao": "Uma referência para você se planejar. O valor final depende das flores da estação e do tamanho escolhido.",
-    "prefixo": "A partir de R$ 29,90",
     "moeda": "R$",
+    "rotuloDe": "de",
+    "rotuloPor": "por",
     "itens": [
-      {
-        "nome": "🌹 Buquês",
-        "detalhe": "Rosas, lírios, gérberas e mistos",
-        "valor": "89,00"
-      },
-      {
-        "nome": "🎁 Cestas",
-        "detalhe": "Café da manhã, chocolates e flores",
-        "valor": "149,00"
-      },
-      {
-        "nome": "💐 Arranjos",
-        "detalhe": "Composições em vaso ou caixa",
-        "valor": "119,00"
-      },
-      {
-        "nome": "💝 Presentes especiais",
-        "detalhe": "Ursinho, perfume, bombons e mimos",
-        "valor": ""
-      },
-      {
-        "nome": "",
-        "detalhe": "",
-        "valor": ""
-      }
+      { "nome": "🌹 Buquês", "detalhe": "Rosas, lírios, gérberas e mistos", "prefixo": "A partir de", "valorAntigo": "", "valor": "89,00" },
+      { "nome": "🎁 Cestas", "detalhe": "Café da manhã, chocolates e flores", "prefixo": "", "valorAntigo": "179,00", "valor": "149,00" },
+      { "nome": "💐 Arranjos", "detalhe": "Composições em vaso ou caixa", "prefixo": "A partir de", "valorAntigo": "", "valor": "119,00" },
+      { "nome": "💝 Presentes especiais", "detalhe": "Ursinho, perfume, bombons e mimos", "prefixo": "", "valorAntigo": "", "valor": "" }
     ],
     "semValor": "Sob consulta",
     "observacao": "Valores sujeitos a alteração conforme a disponibilidade das flores.",
     "botao": "Pedir um orçamento 💐",
     "mensagemWhatsapp": "Olá! Vi os valores no site da Velvet Bloom e queria um orçamento 💐"
   },
+
   "presentes": {
     "eyebrow": "Presentes para cada momento",
     "titulo": "Porque todo sentimento merece um gesto",
@@ -254,6 +157,7 @@
       "💍 Datas especiais"
     ]
   },
+
   "entrega": {
     "eyebrow": "Entrega rápida e cuidadosa",
     "titulo": "Seu presente pode chegar ainda hoje.",
@@ -265,90 +169,53 @@
     ],
     "botao": "Quero fazer uma surpresa 🚚"
   },
+
   "galeria": {
     "eyebrow": "Galeria",
     "titulo": "Um catálogo de momentos",
     "fotos": [
-      {
-        "arquivo": "card/rose-dark.webp",
-        "alt": "Girassol amarelo em close-up"
-      },
-      {
-        "arquivo": "card/roses-pink.webp",
-        "alt": "Buquê de rosas cor-de-rosa"
-      },
-      {
-        "arquivo": "card/daisy.webp",
-        "alt": "Rosa vermelha com orvalho sobre fundo preto"
-      },
-      {
-        "arquivo": "card/tulips.webp",
-        "alt": "Campo de tulipas coral e creme"
-      },
-      {
-        "arquivo": "card/strawflower.webp",
-        "alt": "Flor papel-de-seda rosa"
-      },
-      {
-        "arquivo": "card/sunflower.webp",
-        "alt": "Margarida branca com orvalho"
-      },
-      {
-        "arquivo": "card/rose-orange.webp",
-        "alt": "Rosa laranja em still contra fundo amarelo"
-      },
-      {
-        "arquivo": "card/hydrangea-purple.webp",
-        "alt": "Hortênsia lilás entre folhagem verde"
-      }
+      { "arquivo": "card/rose-dark.webp", "alt": "Girassol amarelo em close-up" },
+      { "arquivo": "card/roses-pink.webp", "alt": "Buquê de rosas cor-de-rosa" },
+      { "arquivo": "card/daisy.webp", "alt": "Rosa vermelha com orvalho sobre fundo preto" },
+      { "arquivo": "card/tulips.webp", "alt": "Campo de tulipas coral e creme" },
+      { "arquivo": "card/strawflower.webp", "alt": "Flor papel-de-seda rosa" },
+      { "arquivo": "card/sunflower.webp", "alt": "Margarida branca com orvalho" },
+      { "arquivo": "card/rose-orange.webp", "alt": "Rosa laranja em still contra fundo amarelo" },
+      { "arquivo": "card/hydrangea-purple.webp", "alt": "Hortênsia lilás entre folhagem verde" }
     ]
   },
+
   "depoimentos": {
     "eyebrow": "Prova social",
     "titulo": "Quem presenteia, lembra.<br>Quem recebe, não esquece.",
     "nota": "Prints reais de conversas com clientes que já presentearam com a Velvet Bloom.",
     "prints": [
-      {
-        "arquivo": "testi/t1.webp",
-        "alt": "Print de agradecimento de cliente da Velvet Bloom: presente com flores e perfume no ursinho encantou a esposa dela"
-      },
-      {
-        "arquivo": "testi/t2.webp",
-        "alt": "Print de conversa de cliente agradecendo o capricho e a delicadeza do presente Velvet Bloom"
-      },
-      {
-        "arquivo": "testi/t3.webp",
-        "alt": "Print de cliente mostrando o buquê Velvet Bloom uma semana depois, ainda intacto"
-      },
-      {
-        "arquivo": "testi/t4.webp",
-        "alt": "Print de cliente agradecendo por um buquê de rosas importadas da Velvet Bloom"
-      },
-      {
-        "arquivo": "testi/t5.webp",
-        "alt": "Print de cliente impressionada com a durabilidade das flores da Velvet Bloom dez dias depois"
-      }
+      { "arquivo": "testi/t1.webp", "alt": "Print de agradecimento de cliente da Velvet Bloom: presente com flores e perfume no ursinho encantou a esposa dela" },
+      { "arquivo": "testi/t2.webp", "alt": "Print de conversa de cliente agradecendo o capricho e a delicadeza do presente Velvet Bloom" },
+      { "arquivo": "testi/t3.webp", "alt": "Print de cliente mostrando o buquê Velvet Bloom uma semana depois, ainda intacto" },
+      { "arquivo": "testi/t4.webp", "alt": "Print de cliente agradecendo por um buquê de rosas importadas da Velvet Bloom" },
+      { "arquivo": "testi/t5.webp", "alt": "Print de cliente impressionada com a durabilidade das flores da Velvet Bloom dez dias depois" }
     ]
   },
+
   "ctaFinal": {
     "eyebrow": "Velvet Bloom Flores & Presentes",
     "titulo": "Tem alguém especial na sua cabeça agora?",
     "descricao": "Transforme esse pensamento em um gesto. A gente cuida do resto.",
     "botao": "Fazer meu pedido pelo WhatsApp 💐"
   },
+
   "rodape": {
     "tagline": "Um presente. Um gesto. Uma memória.",
     "tituloNavegacao": "Navegação",
     "tituloContato": "Contato",
     "tituloEntrega": "Entrega",
-    "entregaLinhas": [
-      "Todos os dias",
-      "Imbé e região"
-    ],
+    "entregaLinhas": ["Todos os dias", "Imbé e região"],
     "textoSeo": "Floricultura em Imbé especializada em flores, buquês, cestas, arranjos e presentes especiais. Atendemos pedidos de flores em Imbé e entrega de flores em toda a região do Litoral Norte do RS, com entregas todos os dias. Fale com a Velvet Bloom pelo WhatsApp e receba cestas em Imbé e presentes em Imbé no mesmo dia.",
     "direitos": "Velvet Bloom Flores & Presentes. Todos os direitos reservados.",
     "localizacao": "Imbé, RS"
   },
+
   "mensagensWhatsapp": {
     "waNav": "Olá! Vim pelo site da Velvet Bloom e quero fazer um pedido 💐",
     "waHero": "Olá! Quero surpreender alguém com um presente da Velvet Bloom 💐",
@@ -359,6 +226,7 @@
     "waMenu": "Olá! Vim pelo site da Velvet Bloom e quero fazer um pedido 💐",
     "waFloat": "Olá! Vim pelo site da Velvet Bloom e quero fazer um pedido 💐"
   },
+
   "acessibilidade": {
     "tooltipWhatsapp": "Fale com a Velvet Bloom",
     "rotuloWhatsappFlutuante": "Falar com a Velvet Bloom no WhatsApp",

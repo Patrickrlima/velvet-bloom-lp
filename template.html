@@ -424,16 +424,29 @@
     transform:translateY(-.3em);
   }
   .preco-valor{
-    flex:none;text-align:right;
+    flex:0 1 auto;text-align:right;
     font-family:var(--font-display);font-style:italic;font-size:1.3rem;color:var(--velvet);
-    white-space:nowrap;
   }
+  /* O "A partir de" fica na MESMA linha do valor, discreto mas legível.
+     Cada pedaço do preço não quebra por dentro; a quebra, se precisar,
+     acontece entre os pedaços — importante no celular quando há promoção. */
+  .preco-atual{white-space:nowrap;}
   .preco-prefixo{
-    display:block;font-family:var(--font-body);font-style:normal;
-    font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--ink-soft);margin-bottom:.1rem;
+    font-family:var(--font-body);font-style:normal;
+    font-size:.78rem;letter-spacing:.02em;
+    color:var(--ink-soft);white-space:nowrap;
   }
-  .preco-consulta{font-size:1rem;color:var(--ink-soft);font-style:italic;}
+  /* Promoção: "de R$ 179,00 por R$ 149,00" — o valor antigo riscado. */
+  .preco-antes{white-space:nowrap;}
+  .preco-rotulo{
+    font-family:var(--font-body);font-style:normal;
+    font-size:.74rem;letter-spacing:.02em;color:var(--ink-soft);
+  }
+  .preco-antigo{
+    font-family:var(--font-body);font-style:normal;font-size:.88rem;
+    color:var(--ink-soft);text-decoration:line-through;
+  }
+  .preco-consulta{font-size:1rem;color:var(--ink-soft);font-style:italic;white-space:nowrap;}
   .precos-observacao{
     max-width:720px;margin:1.6rem auto 0;
     font-size:.82rem;color:var(--ink-soft);text-align:center;
@@ -443,6 +456,14 @@
     .preco-nome{font-size:1.1rem;}
     .preco-valor{font-size:1.12rem;}
     .preco-detalhe{font-size:.8rem;}
+    .preco-prefixo,.preco-rotulo{font-size:.72rem;}
+    .preco-antigo{font-size:.84rem;}
+    /* No celular a disputa por largura não se ganha: o valor desce para a
+       própria linha, inteiro, e o pontilhado sai de cena. Assim "de R$ 179,00
+       por R$ 149,00" nunca se parte no meio, por mais longo que seja o nome. */
+    .preco-item{display:block;}
+    .preco-pontos{display:none;}
+    .preco-valor{display:block;text-align:left;margin-top:.45rem;}
   }
 
   /* ---------- presentes cine (sticky + scroll-zoom video) ---------- */
@@ -808,7 +829,7 @@
           {{#if this.detalhe}}<span class="preco-detalhe">{{this.detalhe}}</span>{{/if}}
         </span>
         <span class="preco-pontos" aria-hidden="true"></span>
-        <span class="preco-valor">{{#if this.valor}}<span class="preco-prefixo">{{precos.prefixo}}</span>{{precos.moeda}} {{this.valor}}{{/if}}{{#unless this.valor}}<span class="preco-consulta">{{precos.semValor}}</span>{{/unless}}</span>
+        <span class="preco-valor">{{#if this.valor}}{{#if this.valorAntigo}}<span class="preco-antes"><span class="preco-rotulo">{{precos.rotuloDe}}</span> <span class="preco-antigo">{{precos.moeda}} {{this.valorAntigo}}</span></span> {{/if}}{{#unless this.valorAntigo}}{{#if this.prefixo}}<span class="preco-prefixo">{{this.prefixo}}</span> {{/if}}{{/unless}}<span class="preco-atual">{{#if this.valorAntigo}}<span class="preco-rotulo">{{precos.rotuloPor}}</span> {{/if}}{{precos.moeda}} {{this.valor}}</span>{{/if}}{{#unless this.valor}}<span class="preco-consulta">{{precos.semValor}}</span>{{/unless}}</span>
       </div>
       {{/each}}
     </div>

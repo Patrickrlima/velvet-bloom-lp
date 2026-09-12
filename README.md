@@ -8,6 +8,7 @@ O site é gerado a partir de duas peças:
 
 - **`content.json`** — todo o conteúdo: textos, fotos, número de WhatsApp, depoimentos, SEO. É aqui que se altera o site no dia a dia.
 - **`template.html`** — a estrutura e o design. Só se mexe aqui para mudar layout, não conteúdo.
+- **`template-privacidade.html`** — a página de política de privacidade, gerada em `dist/privacidade.html`.
 
 O `build.js` junta os dois e escreve o site pronto na pasta `dist/`.
 
@@ -31,6 +32,7 @@ Ou seja: alterou o `content.json` e salvou → o site no ar se atualiza em cerca
 ```
 content.json     conteúdo do site (é o que se edita)
 template.html    estrutura + CSS + JS da página
+template-privacidade.html   página da política de privacidade
 render.js        motor que junta conteúdo e template
 build.js         gera a pasta dist/
 assets/          fotos e vídeos

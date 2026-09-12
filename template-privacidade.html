@@ -1,0 +1,94 @@
+<title>{{privacidade.titulo}} — Velvet Bloom Flores & Presentes</title>
+<meta name="description" content="Como a Velvet Bloom Flores & Presentes trata os dados de quem visita este site.">
+<meta name="robots" content="index, follow">
+{{#if config.siteUrl}}<link rel="canonical" href="{{config.siteUrl}}/privacidade.html">{{/if}}
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B9%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+  /* Página de texto puro: nada de vídeo, nada de animação. Ela existe para
+     ser lida e para o Google encontrar, então carrega praticamente só fonte.
+     As cores e as fontes são as mesmas do site para não parecer outro lugar. */
+  :root{
+    --ink:#24121b; --ink-soft:#6b5460; --velvet:#7d1f3d;
+    --bone:#f6efe3; --bone-line:#e2d5c4; --gold:#b08d3f;
+    --font-display:"Fraunces",Georgia,serif;
+    --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bone);color:var(--ink);
+    font-family:var(--font-body);line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--velvet);}
+  .topo{
+    border-bottom:1px solid var(--bone-line);
+    padding:1.4rem 1.25rem;
+  }
+  .topo-interno,.envolve{max-width:720px;margin-inline:auto;}
+  .marca{
+    font-family:var(--font-display);font-style:italic;font-size:1.35rem;
+    color:var(--velvet);text-decoration:none;display:inline-block;
+  }
+  .marca small{
+    display:block;font-family:var(--font-body);font-style:normal;
+    font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--gold);margin-top:.15rem;
+  }
+  .envolve{padding:2.6rem 1.25rem 3.5rem;}
+  h1{
+    font-family:var(--font-display);font-weight:400;
+    font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.15;margin:0 0 .5rem;
+    /* o mesmo cuidado do site: descida do "g" não pode ser cortada */
+    padding-bottom:.14em;margin-bottom:-.14em;
+  }
+  .atualizado{
+    font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-soft);margin:1rem 0 1.8rem;
+  }
+  .intro{font-size:1.05rem;color:var(--ink-soft);margin:0 0 2.4rem;}
+  h2{
+    font-family:var(--font-display);font-weight:400;
+    font-size:1.3rem;margin:2.2rem 0 .6rem;color:var(--velvet);
+  }
+  p{margin:0 0 1rem;}
+  .rodape{
+    border-top:1px solid var(--bone-line);margin-top:3rem;padding-top:1.6rem;
+    font-size:.88rem;color:var(--ink-soft);
+    display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;justify-content:space-between;
+  }
+  .voltar{
+    display:inline-block;margin-top:2.4rem;
+    border:1px solid var(--bone-line);border-radius:999px;
+    padding:.6rem 1.3rem;text-decoration:none;font-weight:600;font-size:.9rem;
+  }
+  .voltar:hover{border-color:var(--velvet);background:rgba(125,31,61,.05);}
+</style>
+<div class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Velvet Bloom<small>Flores &amp; Presentes</small></a>
+  </div>
+</div>
+
+<main class="envolve">
+  <h1>{{privacidade.titulo}}</h1>
+  <p class="atualizado">Atualizada em {{privacidade.atualizadoEm}}</p>
+  <p class="intro">{{privacidade.intro}}</p>
+
+  {{#each privacidade.blocos}}<h2>{{this.titulo}}</h2>
+  <p>{{this.texto}}</p>
+  {{/each}}
+
+  <a class="voltar" href="index.html">← {{privacidade.voltar}}</a>
+
+  <div class="rodape">
+    <span>© <span id="ano"></span> {{rodape.direitos}}</span>
+    <span>{{rodape.localizacao}}</span>
+  </div>
+</main>
+
+<script>
+  document.getElementById("ano").textContent = new Date().getFullYear();
+</script>

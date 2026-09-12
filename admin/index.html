@@ -845,6 +845,26 @@
       intro:'O último bloco da página, o convite final para chamar no WhatsApp.'
     },
     {
+      id:'medicao', menu:'Divulgação no Google', titulo:'📈 Divulgação no Google',
+      intro:'Esta seção liga a medição usada pelo Google Analytics e pelo Google Ads. Ela existe para saber quantas pessoas clicam nos botões de WhatsApp — sem isso, uma campanha paga roda no escuro.',
+      itens:[
+        ['Ativar a medição do Google', 'Desligado, o site não carrega nenhum script do Google. Ligue só quando a campanha for começar.'],
+        ['O que é medido', 'Todo clique que leva ao WhatsApp, com a seção de onde saiu: topo da página, categoria, lista de valores (com o nome do produto), rodapé ou botão flutuante.'],
+        ['ID do Google Analytics', 'Começa com <span class="exemplo">G-</span>. Mostra quantas visitas o site recebe e de onde elas vêm.'],
+        ['ID do Google Ads e rótulo da conversão', 'Começam com <span class="exemplo">AW-</span>. São eles que avisam ao Google Ads quando um anúncio virou conversa no WhatsApp — é assim que a campanha aprende a gastar melhor.'],
+        ['Quem preenche isso', 'Quem cuida da campanha. Os códigos saem das contas do Analytics e do Ads, e trocar de conta é só trocar aqui — nada de mexer em código.']
+      ]
+    },
+    {
+      id:'privacidadeGuia', menu:'Privacidade', titulo:'🔒 Política de privacidade',
+      intro:'Uma página separada, com link no rodapé do site. Ela existe por causa da LGPD e porque o site passa a usar as ferramentas do Google.',
+      itens:[
+        ['Atualizada em', 'Sempre que mudar qualquer texto desta página, troque a data aqui.'],
+        ['Os trechos', 'Cada trecho é um título e um parágrafo, na ordem em que aparecem na página.'],
+        ['Cuidado', 'O texto que veio pronto descreve exatamente o que este site faz hoje: não tem formulário, não pede dados e só mede cliques. Se um dia isso mudar, o texto precisa mudar junto.']
+      ]
+    },
+    {
       id:'rodape', menu:'Rodapé e Google', titulo:'🔎 Rodapé e Google',
       itens:[
         ['Frase do rodapé e informações de entrega', 'Os textos do finalzinho da página.'],
@@ -1016,6 +1036,8 @@
       c.appendChild(campoTexto('Endereço do Instagram', 'config.instagramUrl'));
       c.appendChild(campoTexto('@ do Instagram', 'config.instagramHandle'));
       c.appendChild(campoTexto('Cidade e região', 'config.regiao'));
+      c.appendChild(campoTexto('Endereço do site', 'config.siteUrl',
+        {dica:'Ex.: https://velvetbloom.com.br — só preencha quando o domínio próprio estiver no ar. É o que gera o sitemap e diz ao Google qual é o endereço oficial da página.'}));
     }, 'contato'));
 
     raiz.appendChild(secao('Tela inicial', 'o que aparece primeiro', function(c){
@@ -1115,6 +1137,41 @@
       c.appendChild(campoTexto('Descrição', 'ctaFinal.descricao', {longo:true}));
       c.appendChild(campoTexto('Botão', 'ctaFinal.botao'));
     }, 'ctafinal'));
+
+    raiz.appendChild(secao('Divulgação no Google', 'Analytics e Google Ads', function(c){
+      var camposMedicao = document.createElement('div');
+
+      c.appendChild(campoInterruptor(
+        'Ativar a medição do Google',
+        'medicao.ativo',
+        'Desligado, o site não carrega nenhum script do Google — nem Analytics, nem Ads. Ligue só quando a campanha for começar, com os códigos já em mãos.',
+        function(ligado){ camposMedicao.style.display = ligado ? '' : 'none'; }
+      ));
+
+      camposMedicao.style.display = conteudo.medicao && conteudo.medicao.ativo ? '' : 'none';
+      camposMedicao.appendChild(campoTexto('ID do Google Analytics', 'medicao.googleAnalytics',
+        {dica:'Começa com G- (ex.: G-A1B2C3D4E5). Fica em Administrador → Fluxos de dados, dentro do Google Analytics.'}));
+      camposMedicao.appendChild(campoTexto('ID do Google Ads', 'medicao.googleAds',
+        {dica:'Começa com AW- (ex.: AW-123456789). Fica em Ferramentas → Conversões, na sua conta do Google Ads.'}));
+      camposMedicao.appendChild(campoTexto('Rótulo da conversão de WhatsApp', 'medicao.conversaoWhatsapp',
+        {dica:'O código completo da conversão, no formato AW-123456789/AbCdEfGhIj. Em branco, os cliques ainda são contados no Analytics, mas não viram conversão no Ads.'}));
+      c.appendChild(camposMedicao);
+    }, 'medicao'));
+
+    raiz.appendChild(secao('Política de privacidade', 'página do rodapé', function(c){
+      c.appendChild(campoTexto('Nome do link no rodapé', 'privacidade.linkRodape'));
+      c.appendChild(campoTexto('Título da página', 'privacidade.titulo'));
+      c.appendChild(campoTexto('Atualizada em', 'privacidade.atualizadoEm',
+        {dica:'Ex.: setembro de 2026. Atualize sempre que mudar o texto.'}));
+      c.appendChild(campoTexto('Texto de abertura', 'privacidade.intro', {longo:true}));
+      (conteudo.privacidade.blocos || []).forEach(function(item, i){
+        var bloco = document.createElement('div');
+        bloco.style.cssText = 'border-top:1px solid var(--linha);padding-top:1rem;margin-top:1rem;';
+        bloco.appendChild(campoTexto('Título do trecho', 'privacidade.blocos.' + i + '.titulo'));
+        bloco.appendChild(campoTexto('Texto', 'privacidade.blocos.' + i + '.texto', {longo:true}));
+        c.appendChild(bloco);
+      });
+    }, 'privacidadeGuia'));
 
     raiz.appendChild(secao('Rodapé e Google', 'textos do fim da página e busca', function(c){
       c.appendChild(campoTexto('Frase do rodapé', 'rodape.tagline'));

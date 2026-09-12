@@ -6,8 +6,36 @@
 <meta property="og:site_name" content="Velvet Bloom Flores & Presentes">
 <meta property="og:title" content="{{seo.ogTitulo}}">
 <meta property="og:description" content="{{seo.ogDescricao}}">
+{{#if config.siteUrl}}<link rel="canonical" href="{{config.siteUrl}}/">
+<meta property="og:url" content="{{config.siteUrl}}/">{{/if}}
 <!-- og:image: ao publicar em domínio próprio, adicionar aqui a URL de uma fotografia real da Velvet Bloom (1200x630) -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B9%3C/text%3E%3C/svg%3E">
+{{#if medicao.ativo}}<!-- ============ Google tag (GA4 e/ou Google Ads) ============
+     Só existe no HTML quando a medição está ligada no painel: site sem
+     campanha no ar não carrega script de terceiro nem pede consentimento
+     de nada. Os IDs também vêm do painel — trocar de conta não exige
+     mexer em código. -->
+<script>
+(function(){
+  var GA  = "{{medicao.googleAnalytics}}";
+  var ADS = "{{medicao.googleAds}}";
+  var primeiro = GA || ADS;
+  if(!primeiro) return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ window.dataLayer.push(arguments); };
+  gtag("js", new Date());
+  if(GA)  gtag("config", GA);
+  if(ADS) gtag("config", ADS);
+
+  /* a biblioteca entra depois; as chamadas acima ficam na fila do dataLayer
+     e são processadas assim que ela carrega — é como o próprio Google faz */
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(primeiro);
+  document.head.appendChild(s);
+})();
+</script>{{/if}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -813,7 +841,7 @@
         <p class="lead">{{essencia.fecho}}</p>
       </div>
       <div class="momentos-video reveal d1">
-        <video src="{{asset essencia.video}}" poster="{{asset essencia.videoPoster}}" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+        <video data-video-sob-demanda data-src="{{asset essencia.video}}" poster="{{asset essencia.videoPoster}}" autoplay muted loop playsinline preload="none" aria-hidden="true"></video>
       </div>
     </div>
     <div class="essencia-gallery reveal d2">
@@ -882,9 +910,7 @@
   <div class="presentes-runway" id="presentesRunway">
     <div class="presentes-pin" id="presentesPin">
       <div class="presentes-frame" id="presentesFrame">
-        <video class="presentes-video" autoplay muted loop playsinline preload="auto" poster="{{asset presentes.videoPoster}}" aria-hidden="true">
-          <source src="{{asset presentes.video}}" type="video/mp4">
-        </video>
+        <video class="presentes-video" data-video-sob-demanda data-src="{{asset presentes.video}}" autoplay muted loop playsinline preload="none" poster="{{asset presentes.videoPoster}}" aria-hidden="true"></video>
         <div class="presentes-veil"></div>
       </div>
       <div class="container presentes-copy" id="presentesCopy">
@@ -1015,6 +1041,7 @@
     <p class="footer-seo">{{rodape.textoSeo}}</p>
     <div class="footer-bottom">
       <span>© <span id="year"></span> {{rodape.direitos}}</span>
+      <span><a href="privacidade.html">{{privacidade.linkRodape}}</a></span>
       <span>{{rodape.localizacao}}</span>
     </div>
   </div>
@@ -1122,6 +1149,86 @@
       }
     );
   })();
+
+  /* ---------------------------------------------------------------
+     Vídeos sob demanda.
+
+     Antes os dois vídeos tinham preload="auto": o navegador baixava 2,2 MB
+     antes mesmo de eles aparecerem na tela. No wi-fi ninguém nota; no 4G
+     isso atrasa a primeira tela inteira — e a experiência da página de
+     destino é um dos itens que o Google usa para calcular o custo por clique.
+
+     Agora cada vídeo só começa a baixar quando está chegando perto da tela.
+     Até lá quem aparece é o poster, que é uma imagem leve. Em navegador sem
+     IntersectionObserver todos carregam de uma vez — que é exatamente o
+     comportamento antigo, nunca pior.
+     --------------------------------------------------------------- */
+  (function videosSobDemanda(){
+    var videos = document.querySelectorAll("video[data-video-sob-demanda]");
+    if(!videos.length) return;
+
+    function carregar(v){
+      if(v.dataset.carregado) return;
+      v.dataset.carregado = "1";
+      v.src = v.getAttribute("data-src");
+      v.load();
+      /* autoplay saiu do HTML (sem src ele não faria nada); aqui o play é
+         explícito, e o catch evita erro no console se o navegador recusar */
+      var p = v.play();
+      if(p && p.catch) p.catch(function(){});
+    }
+
+    if(!("IntersectionObserver" in window)){
+      Array.prototype.forEach.call(videos, carregar);
+      return;
+    }
+
+    var observador = new IntersectionObserver(function(entradas){
+      entradas.forEach(function(e){
+        if(!e.isIntersecting) return;
+        carregar(e.target);
+        observador.unobserve(e.target);
+      });
+    }, { rootMargin: "300px 0px" });   /* começa um pouco antes de aparecer */
+
+    Array.prototype.forEach.call(videos, function(v){ observador.observe(v); });
+  })();
+
+  /* ---------------------------------------------------------------
+     Conversão: todo clique que leva ao WhatsApp é medido, com a origem.
+     Um só ouvinte no documento, em vez de um por botão — assim vale
+     também para as linhas de preço, que a floricultura cria e apaga
+     pelo painel sem que este código precise saber quantas são.
+     --------------------------------------------------------------- */
+  {{#if medicao.ativo}}(function medirWhatsapp(){
+    var CONVERSAO = "{{medicao.conversaoWhatsapp}}";
+
+    function origemDe(a){
+      if(a.hasAttribute("data-preco-wa")) return "valores";
+      if(a.id) return a.id;
+      var sec = a.closest ? a.closest("section, footer") : null;
+      return (sec && sec.id) || "outro";
+    }
+
+    document.addEventListener("click", function(ev){
+      var alvo = ev.target;
+      if(!alvo || !alvo.closest) return;
+      var a = alvo.closest('a[href*="wa.me/"]');
+      if(!a) return;
+      if(typeof window.gtag !== "function") return;
+
+      var dados = { origem: origemDe(a) };
+      var produto = a.getAttribute("data-produto");
+      if(produto) dados.produto = produto;
+
+      /* evento próprio: é o que aparece no GA4 e dá para ver de qual
+         seção da página saem os contatos */
+      gtag("event", "contato_whatsapp", dados);
+
+      /* conversão do Google Ads: só dispara se o rótulo estiver preenchido */
+      if(CONVERSAO) gtag("event", "conversion", { send_to: CONVERSAO });
+    }, true);
+  })();{{/if}}
 
   /* Lista de valores longa: mostra as 6 primeiras e guarda o resto atrás de um
      botão. É feito aqui, em JavaScript, e não no template, porque assim nada

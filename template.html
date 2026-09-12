@@ -215,19 +215,37 @@
     -webkit-backdrop-filter:blur(14px) saturate(1.2);
     box-shadow:0 1px 0 rgba(36,18,27,.08);
   }
-  .brand{display:flex;flex-direction:column;line-height:1;gap:.3rem;}
+  .brand{display:flex;flex-direction:column;line-height:1;gap:.3rem;flex:none;}
+  /* a marca nunca quebra: com o menu mais cheio ela era a primeira a ceder */
+  .brand-mark,.brand-sub{white-space:nowrap;}
   .brand-mark{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:1.5rem;color:var(--bone);transition:color .4s var(--ease);}
   .brand-sub{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-soft);transition:color .4s var(--ease);}
   .nav.is-scrolled .brand-mark{color:var(--velvet);}
   .nav.is-scrolled .brand-sub{color:var(--gold);}
 
-  .nav-links{display:flex;align-items:center;gap:2.1rem;}
+  /* O espaço entre os itens encolhe junto com a tela. Com "Valores" e
+     "Promoções" o menu pode chegar a 8 itens, e um gap fixo empurrava a
+     marca para duas linhas já em telas de notebook. */
+  .nav-links{display:flex;align-items:center;gap:clamp(1rem,1.5vw,2.1rem);}
   .nav-links a{
     font-size:.85rem;font-weight:600;letter-spacing:.03em;color:var(--bone);
     position:relative;padding-block:.3rem;transition:color .4s var(--ease);
   }
   .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:currentColor;transition:right .4s var(--ease);}
   .nav-links a:hover::after{right:0;}
+  /* O link de promoção ganha um ponto dourado: funciona tanto sobre a foto
+     escura do topo quanto sobre o menu claro depois da rolagem. */
+  /* inline-flex no próprio link: alinhar o ponto por vertical-align dependia
+     da entrelinha e ele subia acima do texto. Com flex, ele centraliza
+     sozinho, no menu do topo e no do celular. */
+  .nav-promo{display:inline-flex;align-items:center;}
+  .nav-promo::before{
+    content:"";flex:none;width:.4rem;height:.4rem;border-radius:50%;
+    background:var(--gold);margin-right:.42rem;
+  }
+  /* `hidden` sozinho perderia para o display das regras acima; o link de
+     promoção nasce escondido e só aparece se existir promoção de verdade. */
+  .nav-links a[hidden],.mobile-menu a[hidden]{display:none !important;}
   .nav.is-scrolled .nav-links a{color:var(--ink);}
   .nav-cta{display:flex;align-items:center;gap:1rem;}
   .nav-cta .btn{padding:.75em 1.3em;font-size:.8rem;}
@@ -501,6 +519,13 @@
      vem depois, na media query, e venceria esta aqui — os itens dobrados
      continuariam ocupando a tela. */
   .preco-oculto{display:none !important;}
+  /* Piscada curta ao chegar pelo menu: sem ela a pessoa clica em "Promoções",
+     a página rola e não fica claro qual das linhas era a promoção. */
+  .preco-piscando{animation:precoPisca 1.8s ease;}
+  @keyframes precoPisca{
+    0%,100%{background:transparent;}
+    18%,55%{background:rgba(176,141,63,.18);}
+  }
   .precos-mais{
     display:block;margin:1.1rem auto 0;
     background:transparent;border:1px solid var(--bone-line);border-radius:999px;
@@ -703,7 +728,7 @@
   /* ============================================================
      RESPONSIVE
      ============================================================ */
-  @media (max-width: 1080px){
+  @media (max-width: 1180px){
     .nav-links{display:none;}
     .nav-cta{display:none;}
     .hamburger{display:flex;}
@@ -769,7 +794,7 @@
     </a>
     <nav class="nav-links" aria-label="Navegação principal">
       {{#each menu}}<a href="{{this.ancora}}">{{this.rotulo}}</a>
-      {{/each}}</nav>
+      {{/each}}{{#if precos.mostrar}}<a href="#valores">{{precos.rotuloMenu}}</a>{{#if precos.linkPromocaoNoMenu}}<a class="nav-promo" href="#valores" data-link-promocao hidden>{{precos.rotuloMenuPromocao}}</a>{{/if}}{{/if}}</nav>
     <div class="nav-cta">
       <a class="btn btn-ghost" href="#flores">{{topo.botaoVerPresentes}}</a>
       <a class="btn btn-wa" id="waNav" href="#" target="_blank" rel="noopener">
@@ -787,7 +812,8 @@
 
 <div class="mobile-menu" id="mobileMenu">
   {{#each menu}}<a href="{{this.ancora}}">{{this.rotulo}}</a>
-  {{/each}}
+  {{/each}}{{#if precos.mostrar}}<a href="#valores">{{precos.rotuloMenu}}</a>{{#if precos.linkPromocaoNoMenu}}<a class="nav-promo" href="#valores" data-link-promocao hidden>{{precos.rotuloMenuPromocao}}</a>{{/if}}{{/if}}
+  
   <a class="btn btn-wa" id="waMenu" href="#" target="_blank" rel="noopener">
     <span class="wa-icon-wrap">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.09L2 22l5.09-1.35C8.6 21.5 10.3 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.2c-.22.6-1.3 1.15-1.8 1.2-.46.05-1 .07-1.62-.1-.37-.1-.85-.27-1.46-.53-2.58-1.1-4.26-3.7-4.4-3.87-.13-.17-1.05-1.4-1.05-2.67 0-1.27.67-1.9.9-2.15.23-.25.5-.32.67-.32h.48c.15 0 .36-.06.56.43.22.53.75 1.83.82 1.97.07.13.11.3.02.48-.09.18-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.15.27.68 1.12 1.46 1.82 1 .9 1.85 1.18 2.12 1.31.27.13.43.11.58-.07.16-.18.66-.77.84-1.04.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.5.31.07.13.07.72-.15 1.32z"/></svg>
@@ -1148,6 +1174,49 @@
         linha.setAttribute("href", waLink(msg));
       }
     );
+  })();
+
+  /* ---------------------------------------------------------------
+     Link "Promoções" do menu.
+
+     Ele não depende só do interruptor do painel: depende de existir uma
+     promoção de verdade na página. Se a floricultura esquecer o interruptor
+     ligado depois que a promoção acabar, o link some sozinho em vez de
+     virar uma promessa falsa no menu.
+
+     E ele não leva para o começo da seção de valores — leva para o produto
+     em promoção, abrindo a lista dobrada antes, se precisar. Clicar em
+     "Promoções" e cair numa lista onde a promoção está escondida atrás de
+     "Ver mais" seria pior do que não ter o link.
+     --------------------------------------------------------------- */
+  (function linkPromocao(){
+    var links = document.querySelectorAll("[data-link-promocao]");
+    if(!links.length) return;
+
+    var primeiraPromo = document.querySelector(".preco-item .preco-selo");
+    var linha = primeiraPromo && primeiraPromo.closest(".preco-item");
+
+    if(!linha){
+      Array.prototype.forEach.call(links, function(a){
+        if(a.parentNode) a.parentNode.removeChild(a);
+      });
+      return;
+    }
+
+    Array.prototype.forEach.call(links, function(a){
+      a.hidden = false;
+      a.addEventListener("click", function(ev){
+        ev.preventDefault();
+        /* se a promoção estiver na parte dobrada, abre a lista primeiro */
+        if(linha.classList.contains("preco-oculto")){
+          var mais = document.querySelector(".precos-mais");
+          if(mais) mais.click();
+        }
+        linha.scrollIntoView({ behavior:"smooth", block:"center" });
+        linha.classList.add("preco-piscando");
+        setTimeout(function(){ linha.classList.remove("preco-piscando"); }, 1800);
+      });
+    });
   })();
 
   /* ---------------------------------------------------------------

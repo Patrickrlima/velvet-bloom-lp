@@ -181,6 +181,9 @@
     "rotuloDe": "de",
     "rotuloPor": "por",
     "rotuloPromocao": "Promoção",
+    "rotuloMenu": "Valores",
+    "linkPromocaoNoMenu": true,
+    "rotuloMenuPromocao": "Promoções",
     "mensagemItem": "Olá! Vi {produto} no site da Velvet Bloom ({valor}) e queria saber mais 💐",
     "itens": [
       { "nome": "🌹 Buquês", "detalhe": "Rosas, lírios, gérberas e mistos", "prefixo": "A partir de", "valorAntigo": "", "valor": "89,00" },

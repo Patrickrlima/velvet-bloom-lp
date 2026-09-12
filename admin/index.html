@@ -805,7 +805,8 @@
         ['+ Adicionar produto', 'Cria um produto novo no fim da lista e já abre para preencher. Pode cadastrar quantos quiser.'],
         ['As setas ↑ ↓', 'Mudam a posição do produto na lista do site. O produto novo nasce no fim — use as setas para levá-lo ao lugar certo.'],
         ['No site, cada linha é clicável', 'O cliente clica no produto e o WhatsApp abre com o nome e o preço daquele produto já escritos. O texto dessa mensagem é o campo "Mensagem ao clicar num produto", onde <span class="exemplo">{produto}</span> e <span class="exemplo">{valor}</span> são trocados automaticamente.'],
-        ['Lista grande', 'A partir de 8 produtos o site mostra os 6 primeiros e guarda o resto atrás de um botão "Ver mais". A ordem aqui decide quais aparecem primeiro — deixe no topo os que mais vendem e as promoções.']
+        ['Lista grande', 'A partir de 8 produtos o site mostra os 6 primeiros e guarda o resto atrás de um botão "Ver mais". A ordem aqui decide quais aparecem primeiro — deixe no topo os que mais vendem e as promoções.'],
+        ['Os links no menu do site', 'Ligando a seção, entra um link "Valores" no menu. O link "Promoções", com um ponto dourado, é separado e tem interruptor próprio — e mesmo ligado ele só aparece se existir promoção de verdade. Clicando nele, o site rola até o produto em promoção e pisca nele por um instante, abrindo o "Ver mais" antes, se for preciso.']
       ]
     },
     {
@@ -1092,6 +1093,14 @@
         'Cada item é livre: o "texto antes do valor" é opcional e aparece na mesma linha do preço. ' +
         'Para fazer uma promoção, preencha o valor antigo — o site mostra "de R$ 99,00 por R$ 89,00" com o antigo riscado. ' +
         'Deixe o valor em branco para o item aparecer como "Sob consulta".'));
+      camposPrecos.appendChild(campoTexto('Nome no menu do site', 'precos.rotuloMenu',
+        {dica:'O link que leva até esta seção. Aparece no menu junto com o interruptor acima.'}));
+      camposPrecos.appendChild(campoInterruptor(
+        'Mostrar "Promoções" no menu do site',
+        'precos.linkPromocaoNoMenu',
+        'Um link separado, com um ponto dourado, que leva direto ao produto em promoção. Ele só aparece se houver ao menos um produto com valor antigo preenchido — acabou a promoção, o link some sozinho.'
+      ));
+      camposPrecos.appendChild(campoTexto('Nome do link de promoção', 'precos.rotuloMenuPromocao'));
       camposPrecos.appendChild(campoTexto('Mensagem ao clicar num produto', 'precos.mensagemItem',
         {longo:true, dica:'Cada linha da lista é clicável e abre o WhatsApp. Escreva {produto} e {valor} no texto — eles viram o nome e o preço do produto que o cliente clicou.'}));
       camposPrecos.appendChild(campoTexto('Palavra do selo de promoção', 'precos.rotuloPromocao',
